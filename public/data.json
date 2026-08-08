@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T10:00:24.605Z",
+  "generatedAt": "2026-08-08T10:35:46.525Z",
   "rows": [
     {
       "srNo": "1",
@@ -16214,11 +16214,11 @@
       "variant": "S MT",
       "colour": "ENTICING SILVER",
       "intColour": "BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "SOURAV",
+      "customerName": "SUNIL SINGH",
       "ctdmsStatus": "BND",
-      "customerStatus": "FREE",
+      "customerStatus": "HOLD",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000367",
       "dnDate": "2026-06-29",
