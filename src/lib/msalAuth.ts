@@ -21,7 +21,9 @@ const TENANT_ID = import.meta.env.VITE_AZURE_TENANT_ID || '';
 
 export const isMsalConfigured = Boolean(CLIENT_ID && TENANT_ID);
 
-const SCOPES = ['Files.Read'];
+// Files.Read.All (not just Files.Read) so this works for any org member
+// the file gets shared with — not only its owner. See SETUP.md.
+const SCOPES = ['Files.Read.All'];
 
 let msalInstance: PublicClientApplication | null = null;
 let readyPromise: Promise<PublicClientApplication> | null = null;
