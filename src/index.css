@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  /* Toyota-red / near-black HUD palette */
+  --color-toyota-red: #eb0a1e;
+  --color-toyota-red-dim: #a40815;
+  --color-bg-void: #0a0a0c;
+  --color-bg-panel: #111114;
+  --color-bg-raised: #17171b;
+  --color-border-steel: #2a2a2e;
+  --color-text-primary: #f2f2f4;
+  --color-text-secondary: #9a9aa2;
+  --color-text-muted: #6b6b73;
+
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-void);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(235, 10, 30, 0.07), transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(235, 10, 30, 0.05), transparent 35%);
+  background-attachment: fixed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(235, 10, 30, 0.35);
+  color: #fff;
+}
+
+/* Thin scrollbars for the HUD aesthetic */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-steel);
+  border-radius: 8px;
+  border: 2px solid var(--color-bg-panel);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-toyota-red-dim);
+}
+
+/* Glassmorphism panel utility */
+.glass-panel {
+  background: rgba(17, 17, 20, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-steel);
+}
+
+/* Gradient hairline divider */
+.hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(235, 10, 30, 0.4),
+    transparent
+  );
+}
+
+/* Subtle red glow ring, used on active/focused controls */
+.glow-ring {
+  box-shadow:
+    0 0 0 1px rgba(235, 10, 30, 0.55),
+    0 0 16px 0 rgba(235, 10, 30, 0.25);
+}
+
+input,
+select,
+button {
+  font-family: inherit;
+}
+
+/* Custom range/date inputs keep dark chrome */
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
