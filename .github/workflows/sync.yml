@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # needed to dispatch deploy.yml — see the note in "Trigger deploy" below
 
 concurrency:
   group: sync-data
@@ -32,6 +33,7 @@ jobs:
         run: npm ci
 
       - name: Run sync
+        id: sync
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -46,3 +48,13 @@ jobs:
             exit 0
           fi
           node scripts/sync.mjs
+
+      # GitHub deliberately does NOT let a push made with the default
+      # GITHUB_TOKEN trigger other workflows (infinite-loop protection),
+      # so the data commit above would silently never redeploy the site.
+      # Explicitly dispatch deploy.yml instead, only when data changed.
+      - name: Trigger deploy
+        if: steps.sync.outputs.data_changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"

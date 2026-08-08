@@ -30,7 +30,7 @@
  * Run in CI:     invoked by .github/workflows/sync.yml with the same env
  *                vars injected from GitHub Actions encrypted secrets.
  */
-import { writeFile } from 'node:fs/promises';
+import { writeFile, appendFile } from 'node:fs/promises';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -297,7 +297,15 @@ async function main() {
   console.log(`✓ Wrote ${rows.length} rows to ${OUT_PATH}`);
 
   if (process.env.CI) {
-    await commitIfChanged();
+    const changed = await commitIfChanged();
+    // GitHub's default GITHUB_TOKEN deliberately does NOT trigger other
+    // workflows when it pushes (infinite-loop protection), so a data
+    // commit here would silently NOT redeploy the site. Signal back to
+    // the workflow YAML via $GITHUB_OUTPUT so it can explicitly dispatch
+    // deploy.yml itself when (and only when) data actually changed.
+    if (process.env.GITHUB_OUTPUT) {
+      await appendFile(process.env.GITHUB_OUTPUT, `data_changed=${changed}\n`, 'utf8');
+    }
   }
   await persistRotatedRefreshToken(newRefreshToken);
 }
@@ -341,11 +349,12 @@ async function persistRotatedRefreshToken(newRefreshToken) {
   }
 }
 
+/** @returns {Promise<boolean>} whether a commit was made */
 async function commitIfChanged() {
   try {
     execSync('git diff --quiet -- public/data.json', { stdio: 'ignore' });
     console.log('→ No changes to public/data.json; skipping commit.');
-    return;
+    return false;
   } catch {
     // non-zero exit means there IS a diff
   }
@@ -356,6 +365,7 @@ async function commitIfChanged() {
   execSync('git commit -m "chore: sync data [skip ci-deploy-loop-guard]"');
   execSync('git push');
   console.log('✓ Pushed data update.');
+  return true;
 }
 
 main().catch((err) => {

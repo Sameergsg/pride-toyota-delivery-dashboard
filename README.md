@@ -148,9 +148,12 @@ node --env-file=.env.local scripts/sync.mjs
 Push to `main` → `.github/workflows/deploy.yml` builds the Vite app and
 deploys `dist/` to GitHub Pages (Pages configured to build from GitHub
 Actions). `.github/workflows/sync.yml` runs independently on a 30-minute
-cron and commits `public/data.json` whenever it changes; a push from that
-commit re-triggers the deploy workflow, so the live site stays in sync
-automatically.
+cron and commits `public/data.json` whenever it changes — but a push made
+with the default `GITHUB_TOKEN` deliberately does *not* trigger other
+workflows (GitHub's own infinite-loop protection), so `sync.yml` explicitly
+dispatches `deploy.yml` itself as its last step whenever data actually
+changed. End to end: sheet edited → next 30-min sync picks it up → data
+commit → deploy dispatched → live site updated, with no manual step.
 
 ## Security caveat — read this before treating the passcode as real security
 
