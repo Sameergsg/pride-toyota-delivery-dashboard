@@ -1,15 +1,113 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessGate, isUnlocked } from './components/AccessGate';
+import { SignInGate } from './components/SignInGate';
 import { KpiRow } from './components/KpiRow';
 import { FilterPanel } from './components/FilterPanel';
 import { VehicleTable } from './components/VehicleTable';
 import { fetchDataFile, isRealtimeConfigured, type LoadState } from './lib/dataLoader';
+import { fetchLiveDataFile } from './lib/liveGraph';
+import { isMsalConfigured, getActiveAccount, signOut } from './lib/msalAuth';
 import { makeEmptyFilterState, relativeTime, type FilterState } from './lib/filterLogic';
 
-const POLL_INTERVAL_MS = 5_000;
+const BLOB_POLL_INTERVAL_MS = 5_000; // Azure-Function-backed real-time blob
+const GRAPH_POLL_INTERVAL_MS = 15_000; // direct-from-browser Graph calls — a bit gentler
 
 export default function App() {
+  // Two independent real-time strategies, either of which may be
+  // configured (or neither, in which case it's passcode + 30-min-cron
+  // data.json, unchanged from the original build):
+  //   1. MSAL: browser signs in as a real user, reads Graph directly.
+  //   2. Blob: Azure Function polls Graph server-side, browser polls a
+  //      public blob it writes to.
+  // MSAL takes priority if both happen to be configured.
+  if (isMsalConfigured) {
+    return <MsalDashboard />;
+  }
+  return <PasscodeDashboard />;
+}
+
+/** Original flow: soft passcode gate, fetches public/data.json (optionally polling an Azure Blob). */
+function PasscodeDashboard() {
   const [unlocked, setUnlocked] = useState(isUnlocked());
+  const { state, filters, setFilters, now, load, loadSilent, toggleStatus } = useDashboardData(fetchDataFile);
+
+  useEffect(() => {
+    if (unlocked) load();
+  }, [unlocked, load]);
+
+  useEffect(() => {
+    if (!unlocked || !isRealtimeConfigured) return;
+    const id = setInterval(loadSilent, BLOB_POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [unlocked, loadSilent]);
+
+  if (!unlocked) {
+    return <AccessGate onUnlock={() => setUnlocked(true)} />;
+  }
+
+  return (
+    <Dashboard
+      state={state}
+      filters={filters}
+      onFiltersChange={setFilters}
+      onToggleStatus={toggleStatus}
+      now={now}
+      onRefresh={load}
+      showLiveBadge={isRealtimeConfigured}
+    />
+  );
+}
+
+/** Real-time flow: Microsoft sign-in, reads Graph directly from the browser every few seconds. */
+function MsalDashboard() {
+  const [signedIn, setSignedIn] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const { state, filters, setFilters, now, load, loadSilent, toggleStatus } = useDashboardData(fetchLiveDataFile);
+
+  // On mount, check for an already-cached MSAL account (localStorage) so a
+  // page reload doesn't force a fresh interactive sign-in every time.
+  useEffect(() => {
+    const account = getActiveAccount();
+    setSignedIn(Boolean(account));
+    setCheckingSession(false);
+  }, []);
+
+  useEffect(() => {
+    if (signedIn) load();
+  }, [signedIn, load]);
+
+  useEffect(() => {
+    if (!signedIn) return;
+    const id = setInterval(loadSilent, GRAPH_POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [signedIn, loadSilent]);
+
+  if (checkingSession) return null; // avoid a sign-in flash while restoring a cached session
+
+  if (!signedIn) {
+    return <SignInGate onSignedIn={() => setSignedIn(true)} />;
+  }
+
+  return (
+    <Dashboard
+      state={state}
+      filters={filters}
+      onFiltersChange={setFilters}
+      onToggleStatus={toggleStatus}
+      now={now}
+      onRefresh={load}
+      showLiveBadge
+      account={getActiveAccount()}
+      onSignOut={async () => {
+        await signOut();
+        setSignedIn(false);
+      }}
+    />
+  );
+}
+
+/** Shared data/filter state machine used by both dashboard flavors above. */
+function useDashboardData(fetcher: () => ReturnType<typeof fetchDataFile>) {
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [filters, setFilters] = useState<FilterState>(makeEmptyFilterState());
   const [now, setNow] = useState(Date.now());
@@ -19,50 +117,34 @@ export default function App() {
   const load = useCallback(async () => {
     setState({ status: 'loading' });
     try {
-      const data = await fetchDataFile();
+      const data = await fetcher();
       setState({ status: 'ready', data });
     } catch (err) {
       setState({ status: 'error', message: err instanceof Error ? err.message : String(err) });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Background refresh used by the real-time poller — updates data on
-  // success without flashing the whole dashboard back to a loading state,
-  // and stays silent on transient failures (the next poll tries again).
+  // Background refresh used by pollers — updates data on success without
+  // flashing the whole dashboard back to a loading state, and stays
+  // silent on transient failures (the next poll tries again).
   const loadSilent = useCallback(async () => {
     try {
-      const data = await fetchDataFile();
+      const data = await fetcher();
       if (stateRef.current.status !== 'ready' || data.generatedAt !== stateRef.current.data.generatedAt) {
         setState({ status: 'ready', data });
       }
     } catch (err) {
       console.warn('Background poll failed (will retry):', err);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (unlocked) load();
-  }, [unlocked, load]);
-
-  // Real-time mode: poll the live endpoint every few seconds so Excel
-  // edits show up within seconds instead of waiting for the next visit /
-  // manual refresh. No-op (never scheduled) if VITE_REALTIME_DATA_URL
-  // isn't configured — see azure-function/README.md.
-  useEffect(() => {
-    if (!unlocked || !isRealtimeConfigured) return;
-    const id = setInterval(loadSilent, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [unlocked, loadSilent]);
 
   // Keep the "Last synced" relative-time badge ticking.
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
   }, []);
-
-  if (!unlocked) {
-    return <AccessGate onUnlock={() => setUnlocked(true)} />;
-  }
 
   function toggleStatus(status: string) {
     setFilters((prev) => {
@@ -78,23 +160,50 @@ export default function App() {
     });
   }
 
+  return { state, filters, setFilters, now, load, loadSilent, toggleStatus };
+}
+
+function Dashboard({
+  state,
+  filters,
+  onFiltersChange,
+  onToggleStatus,
+  now,
+  onRefresh,
+  showLiveBadge,
+  account,
+  onSignOut,
+}: {
+  state: LoadState;
+  filters: FilterState;
+  onFiltersChange: (f: FilterState) => void;
+  onToggleStatus: (status: string) => void;
+  now: number;
+  onRefresh: () => void;
+  showLiveBadge: boolean;
+  account?: { name?: string; username?: string } | null;
+  onSignOut?: () => void;
+}) {
   return (
     <div className="min-h-screen pb-12">
       <Header
         generatedAt={state.status === 'ready' ? state.data.generatedAt : null}
         now={now}
-        onRefresh={load}
+        onRefresh={onRefresh}
         loading={state.status === 'loading'}
+        showLiveBadge={showLiveBadge}
+        account={account}
+        onSignOut={onSignOut}
       />
 
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 flex flex-col gap-4 mt-4">
         {state.status === 'loading' && <LoadingState />}
-        {state.status === 'error' && <ErrorState message={state.message} onRetry={load} />}
+        {state.status === 'error' && <ErrorState message={state.message} onRetry={onRefresh} />}
         {state.status === 'ready' && (
           <>
-            <KpiRow rows={state.data.rows} filters={filters} onToggleStatus={toggleStatus} />
-            <FilterPanel rows={state.data.rows} filters={filters} onChange={setFilters} />
-            <VehicleTable allRows={state.data.rows} filters={filters} onFiltersChange={setFilters} />
+            <KpiRow rows={state.data.rows} filters={filters} onToggleStatus={onToggleStatus} />
+            <FilterPanel rows={state.data.rows} filters={filters} onChange={onFiltersChange} />
+            <VehicleTable allRows={state.data.rows} filters={filters} onFiltersChange={onFiltersChange} />
           </>
         )}
       </main>
@@ -107,11 +216,17 @@ function Header({
   now,
   onRefresh,
   loading,
+  showLiveBadge,
+  account,
+  onSignOut,
 }: {
   generatedAt: string | null;
   now: number;
   onRefresh: () => void;
   loading: boolean;
+  showLiveBadge: boolean;
+  account?: { name?: string; username?: string } | null;
+  onSignOut?: () => void;
 }) {
   void now; // forces re-render every 30s so relativeTime() stays fresh
   return (
@@ -133,7 +248,7 @@ function Header({
         </div>
 
         <div className="flex items-center gap-3">
-          {isRealtimeConfigured && (
+          {showLiveBadge && (
             <div className="flex items-center gap-1.5 text-[11px] font-display font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 border border-emerald-400/40 rounded-full px-2.5 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot" />
               Live
@@ -159,6 +274,15 @@ function Header({
             </svg>
             Refresh
           </button>
+          {account && onSignOut && (
+            <button
+              onClick={onSignOut}
+              title={account.username}
+              className="flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-toyota-red bg-bg-raised border border-border-steel rounded-full px-3 py-1.5 transition-colors duration-200"
+            >
+              {account.name ?? account.username ?? 'Sign out'}
+            </button>
+          )}
         </div>
       </div>
     </header>
@@ -183,7 +307,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       <div className="w-10 h-10 rounded-full bg-toyota-red/10 border border-toyota-red/40 flex items-center justify-center text-toyota-red">
         !
       </div>
-      <p className="text-sm text-text-primary">Failed to load data.json</p>
+      <p className="text-sm text-text-primary">Failed to load data</p>
       <p className="text-xs text-text-muted max-w-md text-center">{message}</p>
       <button
         onClick={onRetry}

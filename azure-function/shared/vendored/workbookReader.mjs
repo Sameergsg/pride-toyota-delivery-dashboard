@@ -49,8 +49,15 @@ export function normalizeHeader(h) {
     .toLowerCase();
 }
 
+// Uses TextEncoder + btoa (not Node's Buffer) so this module works
+// unmodified in both Node and the browser — the browser is where the
+// real-time direct-Graph-from-the-frontend path (see src/lib/liveGraph.ts)
+// needs it.
 export function base64UrlEncodeShareUrl(url) {
-  const b64 = Buffer.from(url, 'utf8').toString('base64');
+  const bytes = new TextEncoder().encode(url);
+  let binary = '';
+  for (const b of bytes) binary += String.fromCharCode(b);
+  const b64 = btoa(binary);
   const urlSafe = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   return 'u!' + urlSafe;
 }

@@ -23,10 +23,15 @@ fully functional and demoable. Once credentials are added as GitHub
 secrets, `.github/workflows/sync.yml` starts overwriting `public/data.json`
 with real data from the workbook every 30 minutes.
 
-**Real-time (optional):** for updates within seconds of an Excel save
-instead of waiting up to 30 minutes, see [azure-function/README.md](./azure-function/README.md) —
-a Graph webhook + Azure Function that the dashboard polls every 5 seconds,
-with the 30-minute cron above still running as a fallback.
+**Real-time (optional, recommended):** for updates within seconds of an
+Excel save instead of waiting up to 30 minutes, see the "Real-time setup"
+section of [SETUP.md](./SETUP.md) — the dashboard itself signs in with
+Microsoft (same as the Sales dashboard) and reads Graph directly from the
+browser. One Azure Portal step (a redirect URI), no new hosting. An
+alternative Azure-Function-based path exists too (`azure-function/`,
+webhook-driven, doesn't require every viewer to have a Microsoft account)
+if that trade-off fits better. The 30-minute cron above keeps running as a
+fallback either way.
 
 ## Architecture
 

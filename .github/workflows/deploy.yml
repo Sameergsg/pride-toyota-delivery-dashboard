@@ -32,9 +32,17 @@ jobs:
 
       - name: Build
         env:
-          # Optional — only set once azure-function/ is deployed (see its
-          # README). Blank is fine: the dashboard just uses the bundled
-          # data.json (~30-min freshness) instead of real-time polling.
+          # All optional. Primary real-time path — browser signs in with
+          # Microsoft and reads Graph directly (see SETUP.md, "Real-time
+          # sync"). None of these are secrets: client/tenant IDs and the
+          # share link are public identifiers, safe in the client bundle.
+          VITE_AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          VITE_AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          VITE_SHAREPOINT_SHARE_URL: ${{ vars.SHAREPOINT_SHARE_URL }}
+          # Secondary/optional real-time path — only set once
+          # azure-function/ is deployed (see its README). Blank is fine:
+          # the dashboard falls back to bundled data.json (~30-min
+          # freshness) if neither this nor the above are configured.
           VITE_REALTIME_DATA_URL: ${{ vars.REALTIME_DATA_URL }}
         run: npm run build
 

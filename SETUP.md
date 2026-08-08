@@ -1,17 +1,70 @@
 # Live sync setup — no tenant admin required
 
-This dashboard reads live data from a SharePoint-hosted Excel workbook via
-Microsoft Graph, using **delegated (user sign-in) authentication** — the
-same pattern as Pride Toyota's existing Sales dashboard. You sign in
-**once**, interactively, and the sync script keeps itself logged in after
-that using a refresh token. No Azure AD tenant admin approval is needed, as
-long as your organization allows normal users to consent to the `Files.Read`
-permission for themselves (it does — that's why the existing Sales
-dashboard's one-time login works).
+There are two independent things this dashboard can do, and they don't
+require the same setup:
+
+1. **Real-time updates** (this section) — the dashboard itself signs in
+   with Microsoft, the same way the Sales dashboard does, and reads the
+   sheet directly. Updates appear within seconds. **This needs exactly
+   one Azure Portal step**, below.
+2. **30-minute background sync** (further down this file) — a GitHub
+   Actions robot keeps `public/data.json` fresh as a fallback, in case
+   real-time sign-in isn't set up yet or ever has an outage. This is
+   already fully working (see the rest of this file / azure-function/ for
+   how it was set up) — you don't need to touch it again.
 
 ---
 
-## 1. Register a "public client" app (you can do this yourself)
+## Real-time setup: one step
+
+The app registration `pride-toyota-delivery-dashboard-sync` already
+exists (created earlier for the background sync). It just needs one more
+"platform" added so a web browser is allowed to use it for sign-in:
+
+1. [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID** →
+   **App registrations** → **pride-toyota-delivery-dashboard-sync**.
+2. **Authentication** → **+ Add a platform** → **Single-page application**.
+3. **Redirect URIs** — add both of these (one line each):
+   ```
+   https://sameergsg.github.io/pride-toyota-delivery-dashboard/
+   http://localhost:5173/pride-toyota-delivery-dashboard/
+   ```
+   (the second one is only so you can test with `npm run dev` locally)
+4. Leave the checkboxes below as default → **Configure/Save**.
+
+That's it. No client secret, no redirect logic to write, nothing else to
+grant — the `Files.Read` permission is already on this app from the
+background-sync setup, and the tenant already allows self-consent (proven
+by the fact the background sync's one-time login worked).
+
+Once this is saved, the next `deploy.yml` run picks it up automatically
+(the client ID, tenant ID, and share URL are already set as GitHub repo
+**variables** — not secrets, since none of these three are sensitive).
+Visit the live site and you'll see a **"Sign in with Microsoft"** screen
+instead of the passcode — sign in with an account that has access to the
+workbook, and the dashboard polls Graph directly every 15 seconds from
+then on.
+
+### If you'd rather NOT require every viewer to have a Microsoft account
+
+The real-time setup above means anyone viewing the dashboard needs their
+own Microsoft 365 sign-in with access to the file — which is actually
+*more* secure than the old passcode, but is a bigger ask for casual
+viewers. If you want real-time updates **without** requiring a Microsoft
+login (i.e. keep the passcode, or no login at all), see
+[azure-function/README.md](./azure-function/README.md) instead — a
+webhook-driven Azure Function that does the same real-time refresh
+server-side. More setup, but no per-viewer sign-in.
+
+---
+
+## Background sync (30-min fallback) — reference, already done
+
+The steps below describe how the existing background sync
+(`.github/workflows/sync.yml`) was set up. You don't need to redo this —
+it's here for reference / in case it ever needs to be recreated.
+
+### 1. Register a "public client" app (you can do this yourself)
 
 1. Go to the [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID**
    → **App registrations** → **New registration**.
@@ -36,7 +89,7 @@ From the app's **Overview** page, note down:
 - **Tenant ID** ("Directory (tenant) ID")
 - **Application (client) ID**
 
-## 2. Copy the environment template
+### 2. Copy the environment template
 
 ```bash
 cp .env.example .env.local
@@ -45,7 +98,7 @@ cp .env.example .env.local
 Fill in `AZURE_TENANT_ID` and `AZURE_CLIENT_ID` from step 1.
 `SHAREPOINT_SHARE_URL` is already filled in.
 
-## 3. Sign in once, interactively
+### 3. Sign in once, interactively
 
 ```bash
 node --env-file=.env.local scripts/get-token.mjs
@@ -64,7 +117,7 @@ On success it prints a **refresh token** and also writes it into
 node --env-file=.env.local scripts/sync.mjs
 ```
 
-## 4. Create a GitHub PAT so the automated sync can stay logged in
+### 4. Create a GitHub PAT so the automated sync can stay logged in
 
 Microsoft rotates the refresh token every time it's used — each sync run
 gets a *new* one, and the old one stops working. So the automated
@@ -79,7 +132,7 @@ secret after every run, or it'll only work once.
    **Read and write**.
 4. Generate, and copy the token — this is `GH_PAT` below.
 
-## 5. Add all secrets to GitHub Actions
+### 5. Add all secrets to GitHub Actions
 
 **Settings → Secrets and variables → Actions → New repository secret** —
 add:
@@ -105,7 +158,7 @@ password changes, or certain tenant security policies force re-auth. If
 
 ---
 
-## Alternative: application (client-credentials) flow
+### Alternative: application (client-credentials) flow
 
 If your organization later *does* grant admin consent for an
 application-level Graph permission (`Sites.Read.All`), `scripts/sync.mjs`
