@@ -118,12 +118,25 @@ function base64UrlEncodeShareUrl(url) {
   return 'u!' + urlSafe;
 }
 
-async function graphGet(token, url) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Graph occasionally returns transient 5xx (observed: 504
+// MaxRequestDurationExceeded on large worksheet queries) — retry those a
+// couple of times with backoff rather than failing the whole sync run.
+async function graphGet(token, url, attempt = 1) {
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
     const text = await res.text();
+    if (res.status >= 500 && attempt < 3) {
+      const delay = attempt * 3000;
+      console.warn(`  ⚠ Graph ${res.status} on attempt ${attempt}, retrying in ${delay}ms…`);
+      await sleep(delay);
+      return graphGet(token, url, attempt + 1);
+    }
     throw new Error(`Graph GET ${url} failed (${res.status}): ${text}`);
   }
   return res.json();
@@ -161,6 +174,7 @@ async function findWorksheetAndTable(token, driveId, itemId) {
         bestScore = score;
         best = t;
       }
+      if (bestScore === HEADER_MAP.length) break; // perfect match — no need to check the rest
     }
     if (best && bestScore >= MIN_HEADER_MATCH) return { table: best };
     // Fall through to worksheet scoring if no table matches well.
@@ -183,6 +197,7 @@ async function findWorksheetAndTable(token, driveId, itemId) {
       bestScore = score;
       best = sheet;
     }
+    if (bestScore === HEADER_MAP.length) break; // perfect match — no need to check the rest
   }
 
   if (!best || bestScore < MIN_HEADER_MATCH) {
