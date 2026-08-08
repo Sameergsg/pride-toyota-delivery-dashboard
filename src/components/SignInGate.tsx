@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { signIn } from '../lib/msalAuth';
 
-export function SignInGate({ onSignedIn }: { onSignedIn: () => void }) {
+export function SignInGate() {
   const [error, setError] = useState<string | null>(null);
   const [signing, setSigning] = useState(false);
 
@@ -9,11 +9,13 @@ export function SignInGate({ onSignedIn }: { onSignedIn: () => void }) {
     setSigning(true);
     setError(null);
     try {
+      // Navigates the tab away to Microsoft — this only "returns" (and
+      // only via the catch below) if something goes wrong before the
+      // redirect happens. On success the page unloads; when it comes
+      // back, App.tsx's redirect-response handling takes over.
       await signIn();
-      onSignedIn();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed. Please try again.');
-    } finally {
       setSigning(false);
     }
   }

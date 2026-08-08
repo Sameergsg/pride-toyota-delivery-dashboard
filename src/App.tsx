@@ -6,7 +6,7 @@ import { FilterPanel } from './components/FilterPanel';
 import { VehicleTable } from './components/VehicleTable';
 import { fetchDataFile, isRealtimeConfigured, type LoadState } from './lib/dataLoader';
 import { fetchLiveDataFile } from './lib/liveGraph';
-import { isMsalConfigured, getActiveAccount, signOut } from './lib/msalAuth';
+import { isMsalConfigured, ensureMsalReady, getActiveAccount, signOut } from './lib/msalAuth';
 import { makeEmptyFilterState, relativeTime, type FilterState } from './lib/filterLogic';
 
 const BLOB_POLL_INTERVAL_MS = 5_000; // Azure-Function-backed real-time blob
@@ -64,12 +64,15 @@ function MsalDashboard() {
   const [checkingSession, setCheckingSession] = useState(true);
   const { state, filters, setFilters, now, load, loadSilent, toggleStatus } = useDashboardData(fetchLiveDataFile);
 
-  // On mount, check for an already-cached MSAL account (localStorage) so a
-  // page reload doesn't force a fresh interactive sign-in every time.
+  // On mount: initialize MSAL, process any pending redirect response (the
+  // page may have just come back from Microsoft's sign-in page), and
+  // check for an already-cached account (localStorage) so a plain reload
+  // doesn't force a fresh interactive sign-in every time.
   useEffect(() => {
-    const account = getActiveAccount();
-    setSignedIn(Boolean(account));
-    setCheckingSession(false);
+    ensureMsalReady()
+      .then(() => setSignedIn(Boolean(getActiveAccount())))
+      .catch((err) => console.error('MSAL initialization failed:', err))
+      .finally(() => setCheckingSession(false));
   }, []);
 
   useEffect(() => {
@@ -82,10 +85,10 @@ function MsalDashboard() {
     return () => clearInterval(id);
   }, [signedIn, loadSilent]);
 
-  if (checkingSession) return null; // avoid a sign-in flash while restoring a cached session
+  if (checkingSession) return null; // avoid a sign-in flash while restoring a cached session / processing a redirect
 
   if (!signedIn) {
-    return <SignInGate onSignedIn={() => setSignedIn(true)} />;
+    return <SignInGate />;
   }
 
   return (
