@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+
+    "AZURE_TENANT_ID": "",
+    "AZURE_CLIENT_ID": "",
+    "SHAREPOINT_SHARE_URL": "",
+
+    "STATE_STORAGE_CONNECTION_STRING": "",
+    "GRAPH_CLIENT_STATE": "",
+
+    "WEBHOOK_PUBLIC_URL": "https://<your-function-app-name>.azurewebsites.net/api/webhook"
+  }
+}

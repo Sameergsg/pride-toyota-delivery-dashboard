@@ -1,0 +1,18 @@
+{
+  "name": "pride-toyota-realtime-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time Graph webhook receiver + subscription renewal for the Pride Toyota dashboard — pushes a fresh public/data.json-shaped blob within seconds of the source Excel workbook being saved.",
+  "type": "module",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "sync-vendored": "node sync-vendored.mjs",
+    "prestart": "npm run sync-vendored",
+    "test:sync": "node --env-file=.env.local -e \"import('./shared/doSync.js').then(m => m.doSync()).then(r => console.log('rows:', r.rows.length)).catch(e => { console.error(e); process.exit(1); })\""
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.1",
+    "@azure/storage-blob": "^12.24.0"
+  }
+}

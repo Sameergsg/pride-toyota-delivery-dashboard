@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessGate, isUnlocked } from './components/AccessGate';
 import { KpiRow } from './components/KpiRow';
 import { FilterPanel } from './components/FilterPanel';
 import { VehicleTable } from './components/VehicleTable';
-import { fetchDataFile, type LoadState } from './lib/dataLoader';
+import { fetchDataFile, isRealtimeConfigured, type LoadState } from './lib/dataLoader';
 import { makeEmptyFilterState, relativeTime, type FilterState } from './lib/filterLogic';
+
+const POLL_INTERVAL_MS = 5_000;
 
 export default function App() {
   const [unlocked, setUnlocked] = useState(isUnlocked());
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [filters, setFilters] = useState<FilterState>(makeEmptyFilterState());
   const [now, setNow] = useState(Date.now());
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const load = useCallback(async () => {
     setState({ status: 'loading' });
@@ -22,9 +26,33 @@ export default function App() {
     }
   }, []);
 
+  // Background refresh used by the real-time poller — updates data on
+  // success without flashing the whole dashboard back to a loading state,
+  // and stays silent on transient failures (the next poll tries again).
+  const loadSilent = useCallback(async () => {
+    try {
+      const data = await fetchDataFile();
+      if (stateRef.current.status !== 'ready' || data.generatedAt !== stateRef.current.data.generatedAt) {
+        setState({ status: 'ready', data });
+      }
+    } catch (err) {
+      console.warn('Background poll failed (will retry):', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (unlocked) load();
   }, [unlocked, load]);
+
+  // Real-time mode: poll the live endpoint every few seconds so Excel
+  // edits show up within seconds instead of waiting for the next visit /
+  // manual refresh. No-op (never scheduled) if VITE_REALTIME_DATA_URL
+  // isn't configured — see azure-function/README.md.
+  useEffect(() => {
+    if (!unlocked || !isRealtimeConfigured) return;
+    const id = setInterval(loadSilent, POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [unlocked, loadSilent]);
 
   // Keep the "Last synced" relative-time badge ticking.
   useEffect(() => {
@@ -105,6 +133,12 @@ function Header({
         </div>
 
         <div className="flex items-center gap-3">
+          {isRealtimeConfigured && (
+            <div className="flex items-center gap-1.5 text-[11px] font-display font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 border border-emerald-400/40 rounded-full px-2.5 py-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot" />
+              Live
+            </div>
+          )}
           <div className="flex items-center gap-2 text-xs text-text-secondary bg-bg-raised border border-border-steel rounded-full px-3 py-1.5">
             <span
               className={`w-1.5 h-1.5 rounded-full ${generatedAt ? 'bg-emerald-400 pulse-dot' : 'bg-text-muted'}`}

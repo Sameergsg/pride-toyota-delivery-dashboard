@@ -1,0 +1,50 @@
+name: Deploy Azure Function (real-time sync)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'azure-function/**'
+      - 'scripts/dateParser.mjs'
+      - 'scripts/graphAuth.mjs'
+      - 'scripts/workbookReader.mjs'
+      - '.github/workflows/deploy-function.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: azure-function
+        run: npm ci
+
+      - name: Vendor shared source-of-truth files
+        working-directory: azure-function
+        run: node sync-vendored.mjs
+
+      - name: Check required secrets/vars are configured
+        run: |
+          if [ -z "${{ vars.AZURE_FUNCTIONAPP_NAME }}" ] || [ -z "${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}" ]; then
+            echo "::warning::AZURE_FUNCTIONAPP_NAME (repo variable) or AZURE_FUNCTIONAPP_PUBLISH_PROFILE (repo secret) not set yet — skipping deploy. See azure-function/README.md."
+            echo "skip=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Deploy to Azure Functions
+        if: env.skip != 'true'
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ vars.AZURE_FUNCTIONAPP_NAME }}
+          package: azure-function
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}

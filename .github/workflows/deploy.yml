@@ -31,6 +31,11 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          # Optional — only set once azure-function/ is deployed (see its
+          # README). Blank is fine: the dashboard just uses the bundled
+          # data.json (~30-min freshness) instead of real-time polling.
+          VITE_REALTIME_DATA_URL: ${{ vars.REALTIME_DATA_URL }}
         run: npm run build
 
       - name: Setup Pages

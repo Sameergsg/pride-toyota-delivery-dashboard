@@ -23,6 +23,11 @@ fully functional and demoable. Once credentials are added as GitHub
 secrets, `.github/workflows/sync.yml` starts overwriting `public/data.json`
 with real data from the workbook every 30 minutes.
 
+**Real-time (optional):** for updates within seconds of an Excel save
+instead of waiting up to 30 minutes, see [azure-function/README.md](./azure-function/README.md) —
+a Graph webhook + Azure Function that the dashboard polls every 5 seconds,
+with the 30-minute cron above still running as a fallback.
+
 ## Architecture
 
 ```
@@ -34,22 +39,33 @@ scripts/
                             `node scripts/test-date-parser.mjs`
   graphAuth.mjs             Token acquisition: delegated refresh_token flow
                             (primary) + client_credentials fallback
+  workbookReader.mjs        Auth token + share URL → normalized rows: the
+                            worksheet auto-detection, column mapping, and
+                            Graph-reading logic shared by BOTH sync.mjs
+                            (30-min cron) and azure-function/ (real-time)
   get-token.mjs             ONE-TIME interactive device-code sign-in that
                             mints the initial delegated refresh token
   githubSecrets.mjs        Encrypts + updates a GitHub Actions repo secret
                             via the REST API (libsodium sealed box)
-  sync.mjs                 Graph auth → resolve shared file → read
-                            table/usedRange → normalize columns → write
+  sync.mjs                 Graph auth → workbookReader → write
                             public/data.json → commit if changed → persist
                             rotated refresh token back to GitHub secrets
   generate-mock-data.mjs   Produces a realistic public/data.json for demo
                             use before Azure credentials exist
 
+azure-function/            OPTIONAL real-time path — see its own README.
+                            Graph webhook → re-sync within seconds → public
+                            Blob Storage `data.json` the frontend polls.
+                            Self-contained deployable unit; vendors copies
+                            of dateParser/graphAuth/workbookReader.mjs from
+                            scripts/ at build time (sync-vendored.mjs).
+
 src/
   types.ts                 Fixed internal VehicleRow schema
   config/access.ts         SHA-256 hash for the soft passcode gate
   lib/
-    dataLoader.ts           fetch()'s public/data.json
+    dataLoader.ts           fetch()s the real-time endpoint if configured
+                            (VITE_REALTIME_DATA_URL), else public/data.json
     filterLogic.ts           All filter/sort/search logic, pure functions
   components/
     AccessGate.tsx          Passcode screen (see Security caveat below)
@@ -57,12 +73,15 @@ src/
     FilterPanel.tsx          CTDMS/Customer status multi-selects + date ranges
     MultiSelect.tsx / DateRangeField.tsx   Reusable filter controls
     VehicleTable.tsx         Sortable, per-column-filterable, paginated table
-  App.tsx                   Wires it all together; loading/error states
+  App.tsx                   Wires it all together; polls every 5s in
+                            real-time mode; loading/error states
 
 .github/workflows/
   sync.yml                  Cron (every 30 min) + manual trigger: runs
                              sync.mjs with secrets injected as env vars
   deploy.yml                On push to main: build + deploy to GitHub Pages
+  deploy-function.yml       On push to azure-function/**: deploys the
+                             real-time Azure Function (if configured)
 ```
 
 ### Data flow
