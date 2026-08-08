@@ -1,23 +1,42 @@
 #!/usr/bin/env node
 /**
  * Pulls the live vehicle-delivery workbook from SharePoint via Microsoft
- * Graph (client-credentials / daemon-app flow) and writes public/data.json.
+ * Graph and writes public/data.json.
+ *
+ * Auth: delegated (refresh_token) flow — a human signs in ONCE via
+ * scripts/get-token.mjs, and this script exchanges that refresh token for
+ * a new access token on every run. Microsoft rotates the refresh token on
+ * every exchange, so when running in CI this script also writes the new
+ * refresh token back into the AZURE_REFRESH_TOKEN GitHub Actions secret
+ * (via scripts/githubSecrets.mjs) so the *next* scheduled run still has a
+ * valid one. See SETUP.md.
  *
  * Required env vars (see .env.example / SETUP.md):
  *   AZURE_TENANT_ID
  *   AZURE_CLIENT_ID
- *   AZURE_CLIENT_SECRET
+ *   AZURE_REFRESH_TOKEN     (delegated flow — from scripts/get-token.mjs)
  *   SHAREPOINT_SHARE_URL
  *
- * Run locally:   node scripts/sync.mjs
+ * Optional (only used in CI, to persist the rotated refresh token):
+ *   GH_PAT                  fine-grained PAT scoped to this repo,
+ *                            "Secrets: read and write" permission
+ *   GITHUB_REPOSITORY       auto-set by GitHub Actions ("owner/repo")
+ *
+ * Also supported as a fallback (application/client-credentials flow, if
+ * this tenant ever grants admin consent for an app-only permission):
+ *   AZURE_CLIENT_SECRET     (used instead of AZURE_REFRESH_TOKEN)
+ *
+ * Run locally:   node --env-file=.env.local scripts/sync.mjs
  * Run in CI:     invoked by .github/workflows/sync.yml with the same env
  *                vars injected from GitHub Actions encrypted secrets.
  */
-import { writeFile, readFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCellDate } from './dateParser.mjs';
+import { getAccessToken } from './graphAuth.mjs';
+import { updateRepoSecret } from './githubSecrets.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, '..', 'public', 'data.json');
@@ -26,15 +45,20 @@ const {
   AZURE_TENANT_ID,
   AZURE_CLIENT_ID,
   AZURE_CLIENT_SECRET,
+  AZURE_REFRESH_TOKEN,
   SHAREPOINT_SHARE_URL,
+  GH_PAT,
+  GITHUB_REPOSITORY,
 } = process.env;
 
 function requireEnv() {
   const missing = [];
   if (!AZURE_TENANT_ID) missing.push('AZURE_TENANT_ID');
   if (!AZURE_CLIENT_ID) missing.push('AZURE_CLIENT_ID');
-  if (!AZURE_CLIENT_SECRET) missing.push('AZURE_CLIENT_SECRET');
   if (!SHAREPOINT_SHARE_URL) missing.push('SHAREPOINT_SHARE_URL');
+  if (!AZURE_REFRESH_TOKEN && !AZURE_CLIENT_SECRET) {
+    missing.push('AZURE_REFRESH_TOKEN (run scripts/get-token.mjs once) or AZURE_CLIENT_SECRET');
+  }
   if (missing.length) {
     console.error(
       `\n✖ Missing required env var(s): ${missing.join(', ')}\n` +
@@ -91,27 +115,6 @@ function base64UrlEncodeShareUrl(url) {
   const b64 = Buffer.from(url, 'utf8').toString('base64');
   const urlSafe = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   return 'u!' + urlSafe;
-}
-
-async function getAccessToken() {
-  const tokenUrl = `https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token`;
-  const body = new URLSearchParams({
-    client_id: AZURE_CLIENT_ID,
-    client_secret: AZURE_CLIENT_SECRET,
-    scope: 'https://graph.microsoft.com/.default',
-    grant_type: 'client_credentials',
-  });
-  const res = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Token request failed (${res.status}): ${text}`);
-  }
-  const json = await res.json();
-  return json.access_token;
 }
 
 async function graphGet(token, url) {
@@ -207,8 +210,15 @@ function rowsFromGrid({ headers, values, text, numberFormat }) {
 
 async function main() {
   requireEnv();
-  console.log('→ Authenticating with Azure AD (client credentials)…');
-  const token = await getAccessToken();
+  console.log(
+    `→ Authenticating with Azure AD (${AZURE_REFRESH_TOKEN ? 'delegated refresh-token' : 'client-credentials'} flow)…`,
+  );
+  const { accessToken: token, refreshToken: newRefreshToken } = await getAccessToken({
+    tenantId: AZURE_TENANT_ID,
+    clientId: AZURE_CLIENT_ID,
+    clientSecret: AZURE_CLIENT_SECRET,
+    refreshToken: AZURE_REFRESH_TOKEN,
+  });
 
   console.log('→ Resolving shared workbook…');
   const driveItem = await resolveDriveItem(token);
@@ -241,7 +251,39 @@ async function main() {
 
   if (process.env.CI) {
     await commitIfChanged();
+    await persistRotatedRefreshToken(newRefreshToken);
   }
+}
+
+/**
+ * Microsoft invalidates the previous refresh token every time a new one is
+ * issued (rolling refresh tokens). If we don't save the new one back into
+ * the GitHub secret, the *next* scheduled run 30 minutes from now will
+ * fail. Only relevant for the delegated flow (AZURE_REFRESH_TOKEN set).
+ */
+async function persistRotatedRefreshToken(newRefreshToken) {
+  if (!AZURE_REFRESH_TOKEN) return; // client-credentials flow — nothing to rotate
+  if (!newRefreshToken || newRefreshToken === AZURE_REFRESH_TOKEN) {
+    console.log('→ Refresh token unchanged; skipping secret update.');
+    return;
+  }
+  if (!GH_PAT || !GITHUB_REPOSITORY) {
+    console.warn(
+      '⚠ Refresh token rotated but GH_PAT/GITHUB_REPOSITORY not set — cannot persist it. ' +
+        'The next scheduled sync run will fail. See SETUP.md for the GH_PAT secret.',
+    );
+    return;
+  }
+  const [owner, repo] = GITHUB_REPOSITORY.split('/');
+  console.log('→ Refresh token rotated; updating AZURE_REFRESH_TOKEN secret…');
+  await updateRepoSecret({
+    owner,
+    repo,
+    token: GH_PAT,
+    secretName: 'AZURE_REFRESH_TOKEN',
+    secretValue: newRefreshToken,
+  });
+  console.log('✓ AZURE_REFRESH_TOKEN secret updated for the next run.');
 }
 
 async function commitIfChanged() {

@@ -1,97 +1,117 @@
-# Azure AD / Microsoft Graph setup
+# Live sync setup — no tenant admin required
 
-The dashboard reads live data from a SharePoint-hosted Excel workbook via
-Microsoft Graph. To enable live sync, a **tenant admin** needs to register a
-small "daemon" app (client-credentials flow — no user sign-in, no redirect
-URI) and grant it read-only access to the file.
-
-This only needs to be done **once**. Follow the numbered steps below, then
-hand the four values you collect back to whoever is finishing the setup (or
-add them straight to GitHub Actions secrets yourself — see step 6).
+This dashboard reads live data from a SharePoint-hosted Excel workbook via
+Microsoft Graph, using **delegated (user sign-in) authentication** — the
+same pattern as Pride Toyota's existing Sales dashboard. You sign in
+**once**, interactively, and the sync script keeps itself logged in after
+that using a refresh token. No Azure AD tenant admin approval is needed, as
+long as your organization allows normal users to consent to the `Files.Read`
+permission for themselves (it does — that's why the existing Sales
+dashboard's one-time login works).
 
 ---
 
-## 1. Register the app
+## 1. Register a "public client" app (you can do this yourself)
 
 1. Go to the [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID**
-   (formerly Azure AD) → **App registrations** → **New registration**.
-2. Name it something recognizable, e.g. `pride-toyota-delivery-dashboard-sync`.
+   → **App registrations** → **New registration**.
+2. Name it `pride-toyota-delivery-dashboard-sync`.
 3. **Supported account types**: "Accounts in this organizational directory
-   only" (single tenant) is fine.
-4. **Redirect URI**: leave blank — this app never signs a user in.
+   only".
+4. **Redirect URI**: leave blank.
 5. Click **Register**.
+6. Go to **Authentication** → scroll to **Advanced settings** → set
+   **"Allow public client flows"** to **Yes** → **Save**. (This is what
+   lets the app do a device-code sign-in without needing a client secret.)
+7. Go to **API permissions** → **Add a permission** → **Microsoft Graph** →
+   **Delegated permissions** → search for and add `Files.Read` →
+   **Add permissions**.
+   - You do **not** need to click "Grant admin consent" here — you'll
+     consent for yourself in step 3 below, the same way you did for the
+     Sales dashboard. If your organization *has* locked down user consent
+     tenant-wide, you'll see an error at that step and will need to ask an
+     admin for this one click after all — but try step 3 first.
 
-## 2. Create a client secret
+From the app's **Overview** page, note down:
+- **Tenant ID** ("Directory (tenant) ID")
+- **Application (client) ID**
 
-1. In the new app's page, go to **Certificates & secrets** → **Client
-   secrets** → **New client secret**.
-2. Give it a description and an expiry (12 months is reasonable).
-3. Click **Add**, then **immediately copy the "Value" column** — this is
-   the only time it's shown in full. If you navigate away before copying
-   it, you'll have to create a new one.
-4. **Note the expiry date somewhere** (e.g. a calendar reminder) — the
-   secret must be rotated (steps 2 + 6 repeated) before it expires, or the
-   sync workflow will start failing with 401s.
+## 2. Copy the environment template
 
-## 3. Grant Microsoft Graph Application permissions
-
-1. Go to **API permissions** → **Add a permission** → **Microsoft Graph** →
-   **Application permissions** (not Delegated — this app has no signed-in
-   user).
-2. Add:
-   - `Sites.Read.All`
-   - `Files.Read.All` (add this too if `Sites.Read.All` alone isn't
-     sufficient for your tenant's sharing configuration)
-3. Click **Add permissions**.
-4. Click **Grant admin consent for <your org>** and confirm. Without this
-   step the permissions are requested but not active — Graph calls will
-   return 403.
-
-## 4. Record your three values
-
-From the app's **Overview** page:
-
-| Value | Where to find it |
-|---|---|
-| **Tenant ID** | "Directory (tenant) ID" |
-| **Application (client) ID** | "Application (client) ID" |
-| **Client secret** | The value you copied in step 2 (not shown again) |
-
-## 5. The fourth value — SharePoint share URL
-
-Already known — it's the link the workbook was shared with:
-
-```
-https://goyalsonsautomobilespvtl083-my.sharepoint.com/:x:/g/personal/edp_bhiwani_pridetoyota_in/IQAvAwAiAz4pRov7U8X8MHJ4AdSoT8BgpL4iuZTg6SM3tpA?e=ameVTp
+```bash
+cp .env.example .env.local
 ```
 
-The app registration above needs read access to this file specifically —
-since it's shared under `edp.bhiwani@pridetoyota.in`'s personal OneDrive/
-SharePoint site, `Sites.Read.All` (application-level, tenant-wide) is what
-lets the sync script resolve and read it via Graph's `/shares/{shareId}`
-endpoint regardless of which site it lives on.
+Fill in `AZURE_TENANT_ID` and `AZURE_CLIENT_ID` from step 1.
+`SHAREPOINT_SHARE_URL` is already filled in.
 
-## 6. Add the four values as GitHub Actions secrets
+## 3. Sign in once, interactively
 
-In the repo: **Settings → Secrets and variables → Actions → New repository
-secret**. Add all four:
+```bash
+node --env-file=.env.local scripts/get-token.mjs
+```
 
-- `AZURE_TENANT_ID`
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `SHAREPOINT_SHARE_URL`
+This prints a URL and a short code — open the URL, enter the code, and
+sign in with an account that has access to the workbook (e.g.
+`edp.bhiwani@pridetoyota.in`). Approve the `Files.Read` permission when
+prompted.
 
-Once these exist, the next scheduled run of `.github/workflows/sync.yml`
-(every 30 minutes, or trigger it manually via **Actions → Sync Data → Run
-workflow**) will pull live data and the dashboard will switch from the
-bundled mock dataset to real numbers automatically.
-
-### Local development
-
-Copy `.env.example` to `.env.local` and fill in the same four values, then:
+On success it prints a **refresh token** and also writes it into
+`.env.local` as `AZURE_REFRESH_TOKEN` automatically, so local runs of
+`scripts/sync.mjs` work right away:
 
 ```bash
 node --env-file=.env.local scripts/sync.mjs
 ```
 
-`.env.local` is gitignored — it never gets committed.
+## 4. Create a GitHub PAT so the automated sync can stay logged in
+
+Microsoft rotates the refresh token every time it's used — each sync run
+gets a *new* one, and the old one stops working. So the automated
+30-minute sync needs permission to update its own `AZURE_REFRESH_TOKEN`
+secret after every run, or it'll only work once.
+
+1. Go to **GitHub → Settings → Developer settings → Personal access
+   tokens → Fine-grained tokens → Generate new token**.
+2. **Repository access**: select only this repo
+   (`pride-toyota-delivery-dashboard`).
+3. **Permissions → Repository permissions → Secrets**: set to
+   **Read and write**.
+4. Generate, and copy the token — this is `GH_PAT` below.
+
+## 5. Add all secrets to GitHub Actions
+
+**Settings → Secrets and variables → Actions → New repository secret** —
+add:
+
+- `AZURE_TENANT_ID`
+- `AZURE_CLIENT_ID`
+- `AZURE_REFRESH_TOKEN` (from step 3)
+- `GH_PAT` (from step 4)
+- `SHAREPOINT_SHARE_URL`
+
+Once these exist, the next scheduled run of `.github/workflows/sync.yml`
+(every 30 minutes, or trigger manually via **Actions → Sync Data → Run
+workflow**) pulls live data, and the dashboard switches from the bundled
+mock dataset to real numbers — fully automatically, with no further sign-ins.
+
+### If the refresh token ever does stop working
+
+Refresh tokens expire if unused for 90 days, or if the signed-in account's
+password changes, or certain tenant security policies force re-auth. If
+`sync.yml` starts failing with an auth error, just repeat step 3 (`node
+--env-file=.env.local scripts/get-token.mjs`) and update the
+`AZURE_REFRESH_TOKEN` GitHub secret with the new value.
+
+---
+
+## Alternative: application (client-credentials) flow
+
+If your organization later *does* grant admin consent for an
+application-level Graph permission (`Sites.Read.All`), `scripts/sync.mjs`
+also supports the simpler client-credentials flow as a fallback — just add
+an `AZURE_CLIENT_SECRET` GitHub secret instead of `AZURE_REFRESH_TOKEN`/
+`GH_PAT`, and it'll be used automatically (no refresh-token rotation to
+worry about, no GH_PAT needed). See the app registration's **Certificates &
+secrets** page to create one, and grant `Sites.Read.All` under **API
+permissions → Application permissions**, with admin consent.

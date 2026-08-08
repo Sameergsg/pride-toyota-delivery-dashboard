@@ -1,8 +1,14 @@
 # Pride Toyota — Delivery Dashboard
 
-A private, auto-syncing dashboard for tracking vehicle delivery/inventory
-status at Pride Toyota (Goyal Sons Automobiles Pvt. Ltd.), sourced live from
-a SharePoint-hosted Excel workbook via Microsoft Graph.
+An auto-syncing dashboard for tracking vehicle delivery/inventory status at
+Pride Toyota (Goyal Sons Automobiles Pvt. Ltd.), sourced live from a
+SharePoint-hosted Excel workbook via Microsoft Graph.
+
+> **Note:** this repo is **public**, not private as originally planned —
+> GitHub Pages isn't available for private repos on this account's plan,
+> and public-repo Pages was the option chosen over Vercel/Netlify or a
+> paid plan upgrade. See "Security caveat" below for what that means in
+> practice.
 
 Dark-mode, Toyota-red accented, HUD-style UI: dynamic KPI cards, a full
 filter panel (status multi-selects + 4 independent date-range filters),
@@ -26,9 +32,16 @@ scripts/
   test-date-parser.mjs     Standalone test proving serial vs. text dates
                             for the same calendar date converge — run with
                             `node scripts/test-date-parser.mjs`
-  sync.mjs                 Client-credentials Graph auth → resolve shared
-                            file → read table/usedRange → normalize columns
-                            → write public/data.json → commit if changed
+  graphAuth.mjs             Token acquisition: delegated refresh_token flow
+                            (primary) + client_credentials fallback
+  get-token.mjs             ONE-TIME interactive device-code sign-in that
+                            mints the initial delegated refresh token
+  githubSecrets.mjs        Encrypts + updates a GitHub Actions repo secret
+                            via the REST API (libsodium sealed box)
+  sync.mjs                 Graph auth → resolve shared file → read
+                            table/usedRange → normalize columns → write
+                            public/data.json → commit if changed → persist
+                            rotated refresh token back to GitHub secrets
   generate-mock-data.mjs   Produces a realistic public/data.json for demo
                             use before Azure credentials exist
 
@@ -107,12 +120,24 @@ Default access passcode for the local/demo build: **`pridetoyota2026`**
 
 ## Wiring up live sync
 
-See [SETUP.md](./SETUP.md) for the full Azure AD app-registration walkthrough.
-Short version: register a client-credentials app, grant it Graph
-`Sites.Read.All` (application permission, admin-consented), then add
-`AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` /
-`SHAREPOINT_SHARE_URL` as GitHub Actions repo secrets. Locally, copy
-`.env.example` to `.env.local` and run:
+Auth is **delegated (user sign-in)**, not application/client-credentials —
+same pattern as Pride Toyota's existing Sales dashboard, so it doesn't need
+a tenant admin. See [SETUP.md](./SETUP.md) for the full walkthrough. Short
+version:
+
+1. Register a secret-less "public client" Azure AD app (no admin needed).
+2. Run `node --env-file=.env.local scripts/get-token.mjs` **once** — this
+   opens a device-code sign-in, you approve `Files.Read` for yourself, and
+   it mints a refresh token.
+3. Add `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_REFRESH_TOKEN` /
+   `GH_PAT` / `SHAREPOINT_SHARE_URL` as GitHub Actions repo secrets.
+
+From then on, `scripts/sync.mjs` re-authenticates automatically on every
+30-minute run using the refresh token — and since Microsoft **rotates** the
+refresh token on every use, the script also writes the newly-issued one
+back into the `AZURE_REFRESH_TOKEN` GitHub secret each time (via
+`scripts/githubSecrets.mjs`, using the `GH_PAT` fine-grained token), so the
+*next* run still has a valid one. No repeated sign-ins.
 
 ```bash
 node --env-file=.env.local scripts/sync.mjs
@@ -153,6 +178,12 @@ set up.
 
 To change the passcode, see the instructions at the top of
 `src/config/access.ts`.
+
+**On the `GH_PAT` secret** (see SETUP.md step 4): scope it to *only* this
+repo with *only* "Secrets: read and write" permission, nothing broader. It
+lives solely in GitHub Actions encrypted secrets and is only used
+server-side by `scripts/githubSecrets.mjs` to persist the rotated Graph
+refresh token — it never reaches the browser/frontend bundle.
 
 ## Tech stack
 

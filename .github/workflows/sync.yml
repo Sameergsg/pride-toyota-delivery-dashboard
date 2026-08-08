@@ -26,16 +26,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run sync
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_REFRESH_TOKEN: ${{ secrets.AZURE_REFRESH_TOKEN }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          GH_PAT: ${{ secrets.GH_PAT }}
           SHAREPOINT_SHARE_URL: ${{ secrets.SHAREPOINT_SHARE_URL }}
           CI: true
         run: |
-          if [ -z "$AZURE_TENANT_ID" ] || [ -z "$AZURE_CLIENT_ID" ] || [ -z "$AZURE_CLIENT_SECRET" ] || [ -z "$SHAREPOINT_SHARE_URL" ]; then
+          if [ -z "$AZURE_TENANT_ID" ] || [ -z "$AZURE_CLIENT_ID" ] || [ -z "$SHAREPOINT_SHARE_URL" ] || { [ -z "$AZURE_REFRESH_TOKEN" ] && [ -z "$AZURE_CLIENT_SECRET" ]; }; then
             echo "::warning::Azure AD secrets not configured yet — skipping live sync. See SETUP.md."
             exit 0
           fi
