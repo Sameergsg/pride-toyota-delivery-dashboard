@@ -45,12 +45,46 @@ export function getActiveAccount(): AccountInfo | null {
   return msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0] ?? null;
 }
 
+/**
+ * MSAL tracks "an interaction is currently happening" in browser storage so
+ * it can refuse overlapping popups/redirects. If a previous attempt gets
+ * abandoned ungracefully — popup blocked, tab closed mid-flow, browser
+ * back button — that flag can be left set, and every future sign-in then
+ * fails immediately with `interaction_in_progress` even though nothing is
+ * actually in progress. Clearing it is the documented recovery
+ * (https://aka.ms/msal.js.errors#interaction_in_progress).
+ */
+function clearStuckInteractionState() {
+  for (const storage of [window.sessionStorage, window.localStorage]) {
+    const staleKeys: string[] = [];
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (key?.toLowerCase().includes('interaction')) staleKeys.push(key);
+    }
+    staleKeys.forEach((k) => storage.removeItem(k));
+  }
+}
+
+function isInteractionInProgressError(err: unknown): boolean {
+  return typeof err === 'object' && err !== null && (err as { errorCode?: string }).errorCode === 'interaction_in_progress';
+}
+
 /** Interactive sign-in (popup). Call this from a user click (e.g. "Sign in" button). */
 export async function signIn(): Promise<AccountInfo> {
   const app = await getMsal();
-  const result = await app.loginPopup({ scopes: SCOPES });
-  app.setActiveAccount(result.account);
-  return result.account;
+  try {
+    const result = await app.loginPopup({ scopes: SCOPES });
+    app.setActiveAccount(result.account);
+    return result.account;
+  } catch (err) {
+    if (isInteractionInProgressError(err)) {
+      clearStuckInteractionState();
+      const result = await app.loginPopup({ scopes: SCOPES });
+      app.setActiveAccount(result.account);
+      return result.account;
+    }
+    throw err;
+  }
 }
 
 export async function signOut(): Promise<void> {
@@ -77,8 +111,8 @@ export async function getAccessToken(): Promise<string> {
     return result.accessToken;
   } catch (err) {
     if (err instanceof InteractionRequiredAuthError) {
-      const result = await app.loginPopup({ scopes: SCOPES });
-      app.setActiveAccount(result.account);
+      const account = await signIn();
+      const result = await app.acquireTokenSilent({ scopes: SCOPES, account });
       return result.accessToken;
     }
     throw err;
