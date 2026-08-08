@@ -37,6 +37,7 @@ import { fileURLToPath } from 'node:url';
 import { parseCellDate } from './dateParser.mjs';
 import { getAccessToken } from './graphAuth.mjs';
 import { updateRepoSecret } from './githubSecrets.mjs';
+import { upsertEnvLocal } from './envLocal.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, '..', 'public', 'data.json');
@@ -130,23 +131,69 @@ async function graphGet(token, url) {
 
 async function resolveDriveItem(token) {
   const shareId = base64UrlEncodeShareUrl(SHAREPOINT_SHARE_URL);
-  const url = `https://graph.microsoft.com/v1.0/shares/${shareId}/driveItem?$expand=workbook`;
+  // Note: `$expand=workbook` isn't supported on this endpoint (Graph
+  // returns 501 NotImplemented) — and we don't need it, since we only
+  // read driveId/itemId here and hit the workbook endpoints separately.
+  const url = `https://graph.microsoft.com/v1.0/shares/${shareId}/driveItem`;
   return graphGet(token, url);
 }
 
+// A workbook may have many tabs (reports, summaries, etc alongside the
+// actual data). Rather than blindly using the first table/worksheet, pick
+// whichever one's header row matches our expected schema best — this way
+// adding/reordering/renaming other tabs in the future can't silently break
+// the sync.
+const MIN_HEADER_MATCH = 8; // out of HEADER_MAP.length (28) — confidence floor
+
 async function findWorksheetAndTable(token, driveId, itemId) {
-  // Prefer a named Excel Table if one exists.
   const tablesUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/workbook/tables`;
   const tables = await graphGet(token, tablesUrl);
   if (tables.value && tables.value.length > 0) {
-    return { table: tables.value[0] };
+    if (tables.value.length === 1) return { table: tables.value[0] };
+    // Multiple tables — score each by its header row, same as worksheets below.
+    let best = null;
+    let bestScore = 0;
+    for (const t of tables.value) {
+      const headerUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/workbook/tables/${encodeURIComponent(t.name)}/headerRowRange`;
+      const header = await graphGet(token, headerUrl);
+      const score = buildColumnMapping(header.values[0]).filter(Boolean).length;
+      if (score > bestScore) {
+        bestScore = score;
+        best = t;
+      }
+    }
+    if (best && bestScore >= MIN_HEADER_MATCH) return { table: best };
+    // Fall through to worksheet scoring if no table matches well.
   }
+
   const worksheetsUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/workbook/worksheets`;
   const sheets = await graphGet(token, worksheetsUrl);
   if (!sheets.value || sheets.value.length === 0) {
     throw new Error('Workbook has no worksheets.');
   }
-  return { worksheet: sheets.value[0] };
+
+  let best = null;
+  let bestScore = 0;
+  for (const sheet of sheets.value) {
+    const headerUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}/workbook/worksheets('${encodeURIComponent(sheet.name)}')/range(address='1:1')?$select=values`;
+    const headerRes = await graphGet(token, headerUrl);
+    const headerRow = headerRes.values?.[0] ?? [];
+    const score = buildColumnMapping(headerRow).filter(Boolean).length;
+    if (score > bestScore) {
+      bestScore = score;
+      best = sheet;
+    }
+  }
+
+  if (!best || bestScore < MIN_HEADER_MATCH) {
+    throw new Error(
+      `Could not find a worksheet whose header row matches the expected schema ` +
+        `(best: "${best?.name}" with ${bestScore}/${HEADER_MAP.length} columns matched). ` +
+        `Checked tabs: ${sheets.value.map((s) => s.name).join(', ')}`,
+    );
+  }
+  console.log(`  Auto-detected worksheet "${best.name}" (${bestScore}/${HEADER_MAP.length} expected columns matched)`);
+  return { worksheet: best };
 }
 
 async function readViaTable(token, driveId, itemId, tableName) {
@@ -251,39 +298,47 @@ async function main() {
 
   if (process.env.CI) {
     await commitIfChanged();
-    await persistRotatedRefreshToken(newRefreshToken);
   }
+  await persistRotatedRefreshToken(newRefreshToken);
 }
 
 /**
  * Microsoft invalidates the previous refresh token every time a new one is
- * issued (rolling refresh tokens). If we don't save the new one back into
- * the GitHub secret, the *next* scheduled run 30 minutes from now will
- * fail. Only relevant for the delegated flow (AZURE_REFRESH_TOKEN set).
+ * issued (rolling refresh tokens). If we don't save the new one, the
+ * *next* run — whether that's you locally or the scheduled CI job 30
+ * minutes from now — will fail. Only relevant for the delegated flow
+ * (AZURE_REFRESH_TOKEN set).
  */
 async function persistRotatedRefreshToken(newRefreshToken) {
   if (!AZURE_REFRESH_TOKEN) return; // client-credentials flow — nothing to rotate
   if (!newRefreshToken || newRefreshToken === AZURE_REFRESH_TOKEN) {
-    console.log('→ Refresh token unchanged; skipping secret update.');
+    console.log('→ Refresh token unchanged; skipping.');
     return;
   }
-  if (!GH_PAT || !GITHUB_REPOSITORY) {
-    console.warn(
-      '⚠ Refresh token rotated but GH_PAT/GITHUB_REPOSITORY not set — cannot persist it. ' +
-        'The next scheduled sync run will fail. See SETUP.md for the GH_PAT secret.',
-    );
-    return;
+
+  if (process.env.CI) {
+    if (!GH_PAT || !GITHUB_REPOSITORY) {
+      console.warn(
+        '⚠ Refresh token rotated but GH_PAT/GITHUB_REPOSITORY not set — cannot persist it. ' +
+          'The next scheduled sync run will fail. See SETUP.md for the GH_PAT secret.',
+      );
+      return;
+    }
+    const [owner, repo] = GITHUB_REPOSITORY.split('/');
+    console.log('→ Refresh token rotated; updating AZURE_REFRESH_TOKEN secret…');
+    await updateRepoSecret({
+      owner,
+      repo,
+      token: GH_PAT,
+      secretName: 'AZURE_REFRESH_TOKEN',
+      secretValue: newRefreshToken,
+    });
+    console.log('✓ AZURE_REFRESH_TOKEN secret updated for the next run.');
+  } else {
+    console.log('→ Refresh token rotated; updating .env.local…');
+    await upsertEnvLocal({ AZURE_REFRESH_TOKEN: newRefreshToken });
+    console.log('✓ .env.local updated for the next local run.');
   }
-  const [owner, repo] = GITHUB_REPOSITORY.split('/');
-  console.log('→ Refresh token rotated; updating AZURE_REFRESH_TOKEN secret…');
-  await updateRepoSecret({
-    owner,
-    repo,
-    token: GH_PAT,
-    secretName: 'AZURE_REFRESH_TOKEN',
-    secretValue: newRefreshToken,
-  });
-  console.log('✓ AZURE_REFRESH_TOKEN secret updated for the next run.');
 }
 
 async function commitIfChanged() {
