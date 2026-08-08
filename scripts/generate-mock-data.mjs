@@ -68,7 +68,12 @@ function addDays(iso, days) {
   return d.toISOString().slice(0, 10);
 }
 
-const ROW_COUNT = 240;
+// Matches the real sheet's current scale (~744 rows as of Aug 2026) so the
+// demo dataset exercises pagination/scroll/filtering the same way the real
+// data will. The sync pipeline itself (scripts/sync.mjs) has no row cap —
+// it reads the full Excel Table/usedRange dynamically, so it will keep
+// working unchanged as the real sheet grows well past this.
+const ROW_COUNT = 744;
 const rows = [];
 
 for (let i = 1; i <= ROW_COUNT; i++) {

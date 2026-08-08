@@ -68,10 +68,10 @@ export function VehicleTable({ allRows, filters, onFiltersChange }: Props) {
           />
         </div>
         <div className="text-xs text-text-secondary whitespace-nowrap">
-          Showing <span className="text-text-primary font-medium tabular-nums">{pageRows.length}</span> of{' '}
+          Showing <span className="text-toyota-red font-medium tabular-nums">{pageRows.length}</span> of{' '}
           <span className="text-text-primary font-medium tabular-nums">{sorted.length}</span> records
           {sorted.length !== allRows.length && (
-            <span className="text-text-muted"> (of {allRows.length} total)</span>
+            <span className="text-text-muted tabular-nums"> (of {allRows.length} total)</span>
           )}
         </div>
       </div>
@@ -85,7 +85,7 @@ export function VehicleTable({ allRows, filters, onFiltersChange }: Props) {
                   <button
                     type="button"
                     onClick={() => toggleSort(col.key)}
-                    className="w-full flex items-center gap-1 px-3 pt-3 pb-1.5 text-[11px] uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors duration-150"
+                    className="w-full flex items-center gap-1 px-3 pt-3 pb-1.5 font-display text-[11px] font-semibold uppercase tracking-wider text-text-secondary hover:text-toyota-red transition-colors duration-150"
                   >
                     {col.label}
                     <SortIcon active={sort.key === col.key} dir={sort.dir} />
@@ -108,11 +108,17 @@ export function VehicleTable({ allRows, filters, onFiltersChange }: Props) {
                 key={`${row.chassis ?? 'row'}-${i}`}
                 className="border-b border-border-steel/60 hover:bg-toyota-red/5 transition-colors duration-150"
               >
-                {TABLE_COLUMNS.map((col) => (
-                  <td key={col.key} className="px-3 py-2 text-text-primary/90 whitespace-nowrap">
-                    {row[col.key] || <span className="text-text-muted">—</span>}
-                  </td>
-                ))}
+                {TABLE_COLUMNS.map((col) => {
+                  const isCode = col.key === 'chassis' || col.key === 'engNo';
+                  return (
+                    <td
+                      key={col.key}
+                      className={`px-3 py-2 text-text-primary/90 whitespace-nowrap ${isCode ? 'font-mono text-xs tracking-tight' : ''}`}
+                    >
+                      {row[col.key] || <span className="text-text-muted">—</span>}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

@@ -1,19 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  /* Toyota-red / near-black HUD palette */
-  --color-toyota-red: #eb0a1e;
-  --color-toyota-red-dim: #a40815;
-  --color-bg-void: #0a0a0c;
-  --color-bg-panel: #111114;
-  --color-bg-raised: #17171b;
-  --color-border-steel: #2a2a2e;
-  --color-text-primary: #f2f2f4;
-  --color-text-secondary: #9a9aa2;
-  --color-text-muted: #6b6b73;
+  /* Toyota-red HUD palette — lifted off pure-black into a cooler graphite
+     so panels read as lit surfaces, not a void. */
+  --color-toyota-red: #ff1f39;
+  --color-toyota-red-dim: #b3132a;
+  --color-toyota-red-glow: #ff5468;
+
+  --color-bg-void: #0b0e14;
+  --color-bg-panel: #141824;
+  --color-bg-raised: #1b2130;
+  --color-border-steel: #2e3648;
+  --color-border-steel-bright: #414d68;
+
+  --color-text-primary: #f4f6fb;
+  --color-text-secondary: #a7b0c4;
+  --color-text-muted: #6d7690;
+
+  /* Secondary HUD accent — used sparingly to break red-monotony on
+     data/status elements (fleet-ops "signal" colors). */
+  --color-signal-cyan: #22d3ee;
+  --color-signal-amber: #fbbf24;
+  --color-signal-emerald: #34d399;
+  --color-signal-violet: #a78bfa;
 
   --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --font-display: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
 }
 
 :root {
@@ -33,10 +46,43 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  isolation: isolate;
+}
+
+/* HUD radar-grid backdrop: faint blueprint grid + drifting glow blobs.
+   Fixed + behind everything (z-index -2/-1) so panels sit "lit" on top. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
   background-image:
-    radial-gradient(circle at 15% 0%, rgba(235, 10, 30, 0.07), transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(235, 10, 30, 0.05), transparent 35%);
-  background-attachment: fixed;
+    linear-gradient(rgba(255, 31, 57, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 31, 57, 0.055) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(circle at 12% -5%, rgba(255, 31, 57, 0.22), transparent 42%),
+    radial-gradient(circle at 92% 8%, rgba(34, 211, 238, 0.14), transparent 38%),
+    radial-gradient(circle at 50% 105%, rgba(255, 31, 57, 0.12), transparent 45%);
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-1.5%, 1%, 0) scale(1.04);
+  }
 }
 
 * {
@@ -44,11 +90,10 @@ body {
 }
 
 ::selection {
-  background: rgba(235, 10, 30, 0.35);
+  background: rgba(255, 31, 57, 0.35);
   color: #fff;
 }
 
-/* Thin scrollbars for the HUD aesthetic */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -57,7 +102,7 @@ body {
   background: var(--color-bg-panel);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-steel);
+  background: var(--color-border-steel-bright);
   border-radius: 8px;
   border: 2px solid var(--color-bg-panel);
 }
@@ -65,30 +110,57 @@ body {
   background: var(--color-toyota-red-dim);
 }
 
-/* Glassmorphism panel utility */
+/* Glassmorphism panel — lit surface with a gradient hairline top edge,
+   like an instrument-cluster tile. */
 .glass-panel {
-  background: rgba(17, 17, 20, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  background: linear-gradient(180deg, rgba(27, 33, 48, 0.82) 0%, rgba(20, 24, 36, 0.78) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border-steel);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 40px -24px rgba(0, 0, 0, 0.6);
 }
 
-/* Gradient hairline divider */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 31, 57, 0.55), transparent);
+}
+
 .hairline {
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(235, 10, 30, 0.4),
+    rgba(255, 31, 57, 0.45),
     transparent
   );
 }
 
-/* Subtle red glow ring, used on active/focused controls */
 .glow-ring {
   box-shadow:
-    0 0 0 1px rgba(235, 10, 30, 0.55),
-    0 0 16px 0 rgba(235, 10, 30, 0.25);
+    0 0 0 1px rgba(255, 31, 57, 0.6),
+    0 0 20px 2px rgba(255, 31, 57, 0.28);
+}
+
+/* Slow breathing glow for "live" indicators (status dot, gate icon). */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0);
+  }
+}
+.pulse-dot {
+  animation: pulse-glow 2.2s ease-in-out infinite;
 }
 
 input,
@@ -97,8 +169,17 @@ button {
   font-family: inherit;
 }
 
-/* Custom range/date inputs keep dark chrome */
 input[type='date']::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
+  filter: invert(0.75);
   cursor: pointer;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }

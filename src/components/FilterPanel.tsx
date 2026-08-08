@@ -38,7 +38,9 @@ export function FilterPanel({ rows, filters, onChange }: Props) {
   return (
     <div className="glass-panel rounded-lg p-4 flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-text-primary tracking-tight">Filters</h2>
+        <h2 className="font-display text-sm font-semibold uppercase tracking-widest text-text-primary">
+          Filters
+        </h2>
         {!isFilterStateEmpty(filters) && (
           <button
             onClick={clearAll}

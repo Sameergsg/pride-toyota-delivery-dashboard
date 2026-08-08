@@ -88,30 +88,33 @@ function Header({
   void now; // forces re-render every 30s so relativeTime() stays fresh
   return (
     <header className="sticky top-0 z-30 glass-panel border-b border-border-steel">
+      <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-toyota-red/60 to-transparent" />
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-toyota-red/10 border border-toyota-red/40 flex items-center justify-center">
-            <span className="text-toyota-red font-bold">P</span>
+          <div className="relative w-9 h-9 rounded-md bg-toyota-red/10 border border-toyota-red/50 flex items-center justify-center glow-ring">
+            <span className="font-display font-bold text-toyota-red drop-shadow-[0_0_6px_rgba(255,31,57,0.7)]">
+              P
+            </span>
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-text-primary tracking-tight leading-none">
-              Pride Toyota — Delivery Dashboard
+            <h1 className="font-display text-base font-semibold text-text-primary tracking-wide leading-none uppercase">
+              Pride Toyota <span className="text-toyota-red">//</span> Delivery Dashboard
             </h1>
-            <p className="text-[11px] text-text-muted mt-0.5">Goyal Sons Automobiles Pvt. Ltd.</p>
+            <p className="text-[11px] text-text-muted mt-1 tracking-wide">Goyal Sons Automobiles Pvt. Ltd.</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-bg-raised border border-border-steel rounded-full px-3 py-1.5">
+          <div className="flex items-center gap-2 text-xs text-text-secondary bg-bg-raised border border-border-steel rounded-full px-3 py-1.5">
             <span
-              className={`w-1.5 h-1.5 rounded-full ${generatedAt ? 'bg-emerald-400' : 'bg-text-muted'}`}
+              className={`w-1.5 h-1.5 rounded-full ${generatedAt ? 'bg-emerald-400 pulse-dot' : 'bg-text-muted'}`}
             />
-            Last synced: {generatedAt ? relativeTime(generatedAt) : '—'}
+            <span className="tabular-nums">Last synced: {generatedAt ? relativeTime(generatedAt) : '—'}</span>
           </div>
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 text-xs font-medium text-text-primary bg-bg-raised hover:border-toyota-red/60 disabled:opacity-50 border border-border-steel rounded-full px-3 py-1.5 transition-colors duration-200"
+            className="flex items-center gap-1.5 text-xs font-medium text-text-primary bg-bg-raised hover:border-toyota-red/60 hover:text-toyota-red disabled:opacity-50 border border-border-steel rounded-full px-3 py-1.5 transition-colors duration-200"
           >
             <svg
               className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`}

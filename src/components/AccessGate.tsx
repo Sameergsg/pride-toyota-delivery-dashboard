@@ -36,19 +36,23 @@ export function AccessGate({ onUnlock }: { onUnlock: () => void }) {
     <div className="min-h-screen flex items-center justify-center bg-bg-void px-4">
       <div className="w-full max-w-sm glass-panel rounded-xl p-8 shadow-2xl">
         <div className="flex flex-col items-center gap-2 mb-6">
-          <div className="w-12 h-12 rounded-lg bg-toyota-red/10 border border-toyota-red/40 flex items-center justify-center glow-ring">
-            <span className="text-toyota-red font-bold text-xl">P</span>
+          <div className="w-14 h-14 rounded-lg bg-toyota-red/10 border border-toyota-red/50 flex items-center justify-center glow-ring">
+            <span className="font-display text-toyota-red font-bold text-2xl drop-shadow-[0_0_8px_rgba(255,31,57,0.7)]">
+              P
+            </span>
           </div>
-          <h1 className="text-lg font-semibold text-text-primary tracking-tight">
+          <h1 className="font-display text-xl font-semibold text-text-primary tracking-wide uppercase mt-1">
             Pride Toyota
           </h1>
-          <p className="text-xs text-text-muted uppercase tracking-widest">
+          <p className="text-[11px] text-text-muted uppercase tracking-[0.2em]">
             Delivery &amp; Inventory Dashboard
           </p>
         </div>
 
+        <div className="hairline mb-6" />
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <label htmlFor="passcode" className="text-xs text-text-secondary">
+          <label htmlFor="passcode" className="text-[11px] font-display font-semibold uppercase tracking-widest text-text-secondary">
             Enter access passcode
           </label>
           <input
@@ -60,7 +64,7 @@ export function AccessGate({ onUnlock }: { onUnlock: () => void }) {
               setValue(e.target.value);
               setError(false);
             }}
-            className={`bg-bg-raised border rounded-md px-3 py-2 text-sm text-text-primary outline-none transition-colors duration-200 ${
+            className={`bg-bg-raised border rounded-md px-3 py-2.5 text-sm font-mono tracking-widest text-text-primary outline-none transition-colors duration-200 ${
               error ? 'border-toyota-red glow-ring' : 'border-border-steel focus:border-toyota-red/60'
             }`}
             placeholder="••••••••"
@@ -71,7 +75,7 @@ export function AccessGate({ onUnlock }: { onUnlock: () => void }) {
           <button
             type="submit"
             disabled={checking || !value}
-            className="mt-2 bg-toyota-red hover:bg-toyota-red-dim disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 text-white text-sm font-medium rounded-md px-3 py-2"
+            className="mt-2 bg-toyota-red hover:bg-toyota-red-dim disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 text-white text-sm font-display font-semibold uppercase tracking-wider rounded-md px-3 py-2.5 shadow-[0_0_20px_-4px_rgba(255,31,57,0.7)]"
           >
             {checking ? 'Checking…' : 'Enter'}
           </button>
