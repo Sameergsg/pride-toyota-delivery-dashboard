@@ -76,17 +76,31 @@ export function distinctValues(rows: VehicleRow[], key: keyof VehicleRow): strin
   return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 }
 
-/** Apply status + date-range filters only (used for KPI computation, which excludes CTDMS status itself). */
-export function applyNonStatusFilters(
+export interface ApplyFiltersOptions {
+  /** Skip the CTDMS Status filter itself — used when computing the CTDMS KPI row's own counts, so a card's count reflects "how many rows have this status" among everything else filtered, not zeroed out once that status is selected. */
+  skipCtdmsStatus?: boolean;
+  /** Same idea, for the Customer Status KPI row. */
+  skipCustomerStatus?: boolean;
+}
+
+/**
+ * The one filter pipeline, used everywhere: status multi-selects + date
+ * ranges + per-column table filters + global search. KPI cards call this
+ * with `skip*Status: true` for their own dimension (self-excluding facet
+ * counts) but otherwise see the exact same filtered set as the table —
+ * including column filters and the search box — so KPIs and the table
+ * never disagree about what's currently in view.
+ */
+export function applyFilters(
   rows: VehicleRow[],
   filters: FilterState,
-  opts: { skipCtdmsStatus?: boolean } = {},
+  opts: ApplyFiltersOptions = {},
 ): VehicleRow[] {
-  return rows.filter((row) => {
+  let out = rows.filter((row) => {
     if (!opts.skipCtdmsStatus && filters.ctdmsStatus.size > 0) {
       if (!row.ctdmsStatus || !filters.ctdmsStatus.has(row.ctdmsStatus)) return false;
     }
-    if (filters.customerStatus.size > 0) {
+    if (!opts.skipCustomerStatus && filters.customerStatus.size > 0) {
       if (!row.customerStatus || !filters.customerStatus.has(row.customerStatus)) return false;
     }
     for (const field of Object.keys(filters.dateRanges) as DateField[]) {
@@ -94,11 +108,6 @@ export function applyNonStatusFilters(
     }
     return true;
   });
-}
-
-/** Full pipeline: status + date ranges + per-column filters + global search. */
-export function applyAllFilters(rows: VehicleRow[], filters: FilterState): VehicleRow[] {
-  let out = applyNonStatusFilters(rows, filters);
 
   for (const col of TABLE_COLUMNS) {
     const val = filters.columnFilters[col.key];
@@ -119,6 +128,11 @@ export function applyAllFilters(rows: VehicleRow[], filters: FilterState): Vehic
   }
 
   return out;
+}
+
+/** Full pipeline, no facet skipped — what the table itself shows. */
+export function applyAllFilters(rows: VehicleRow[], filters: FilterState): VehicleRow[] {
+  return applyFilters(rows, filters);
 }
 
 export type SortDirection = 'asc' | 'desc';

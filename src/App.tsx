@@ -32,7 +32,8 @@ export default function App() {
 /** Original flow: soft passcode gate, fetches public/data.json (optionally polling an Azure Blob). */
 function PasscodeDashboard() {
   const [unlocked, setUnlocked] = useState(isUnlocked());
-  const { state, filters, setFilters, now, load, loadSilent, toggleStatus } = useDashboardData(fetchDataFile);
+  const { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus } =
+    useDashboardData(fetchDataFile);
 
   useEffect(() => {
     if (unlocked) load();
@@ -53,7 +54,8 @@ function PasscodeDashboard() {
       state={state}
       filters={filters}
       onFiltersChange={setFilters}
-      onToggleStatus={toggleStatus}
+      onToggleCtdmsStatus={toggleCtdmsStatus}
+      onToggleCustomerStatus={toggleCustomerStatus}
       now={now}
       onRefresh={load}
       showLiveBadge={isRealtimeConfigured}
@@ -65,7 +67,8 @@ function PasscodeDashboard() {
 function MsalDashboard() {
   const [signedIn, setSignedIn] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
-  const { state, filters, setFilters, now, load, loadSilent, toggleStatus } = useDashboardData(fetchLiveDataFile);
+  const { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus } =
+    useDashboardData(fetchLiveDataFile);
 
   // On mount: initialize MSAL, process any pending redirect response (the
   // page may have just come back from Microsoft's sign-in page), and
@@ -99,7 +102,8 @@ function MsalDashboard() {
       state={state}
       filters={filters}
       onFiltersChange={setFilters}
-      onToggleStatus={toggleStatus}
+      onToggleCtdmsStatus={toggleCtdmsStatus}
+      onToggleCustomerStatus={toggleCustomerStatus}
       now={now}
       onRefresh={load}
       showLiveBadge
@@ -110,6 +114,18 @@ function MsalDashboard() {
       }}
     />
   );
+}
+
+function toggleSetValue(set: Set<string>, value: string): Set<string> {
+  const next = new Set(set);
+  if (value === '__ALL__') {
+    next.clear();
+  } else if (next.has(value)) {
+    next.delete(value);
+  } else {
+    next.add(value);
+  }
+  return next;
 }
 
 /** Shared data/filter state machine used by both dashboard flavors above. */
@@ -152,28 +168,23 @@ function useDashboardData(fetcher: () => ReturnType<typeof fetchDataFile>) {
     return () => clearInterval(id);
   }, []);
 
-  function toggleStatus(status: string) {
-    setFilters((prev) => {
-      const next = new Set(prev.ctdmsStatus);
-      if (status === '__ALL__') {
-        next.clear();
-      } else if (next.has(status)) {
-        next.delete(status);
-      } else {
-        next.add(status);
-      }
-      return { ...prev, ctdmsStatus: next };
-    });
+  function toggleCtdmsStatus(status: string) {
+    setFilters((prev) => ({ ...prev, ctdmsStatus: toggleSetValue(prev.ctdmsStatus, status) }));
   }
 
-  return { state, filters, setFilters, now, load, loadSilent, toggleStatus };
+  function toggleCustomerStatus(status: string) {
+    setFilters((prev) => ({ ...prev, customerStatus: toggleSetValue(prev.customerStatus, status) }));
+  }
+
+  return { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus };
 }
 
 function Dashboard({
   state,
   filters,
   onFiltersChange,
-  onToggleStatus,
+  onToggleCtdmsStatus,
+  onToggleCustomerStatus,
   now,
   onRefresh,
   showLiveBadge,
@@ -183,7 +194,8 @@ function Dashboard({
   state: LoadState;
   filters: FilterState;
   onFiltersChange: (f: FilterState) => void;
-  onToggleStatus: (status: string) => void;
+  onToggleCtdmsStatus: (status: string) => void;
+  onToggleCustomerStatus: (status: string) => void;
   now: number;
   onRefresh: () => void;
   showLiveBadge: boolean;
@@ -207,7 +219,24 @@ function Dashboard({
         {state.status === 'error' && <ErrorState message={state.message} onRetry={onRefresh} />}
         {state.status === 'ready' && (
           <>
-            <KpiRow rows={state.data.rows} filters={filters} onToggleStatus={onToggleStatus} />
+            <KpiRow
+              rows={state.data.rows}
+              filters={filters}
+              field="ctdmsStatus"
+              selected={filters.ctdmsStatus}
+              skipCtdmsStatus
+              onToggle={onToggleCtdmsStatus}
+              sectionLabel="CTDMS Status"
+            />
+            <KpiRow
+              rows={state.data.rows}
+              filters={filters}
+              field="customerStatus"
+              selected={filters.customerStatus}
+              skipCustomerStatus
+              onToggle={onToggleCustomerStatus}
+              sectionLabel="Customer Status"
+            />
             <FilterPanel rows={state.data.rows} filters={filters} onChange={onFiltersChange} />
             <VehicleTable allRows={state.data.rows} filters={filters} onFiltersChange={onFiltersChange} />
           </>
