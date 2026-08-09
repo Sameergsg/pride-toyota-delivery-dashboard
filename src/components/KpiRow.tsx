@@ -54,21 +54,21 @@ export function KpiRow({ rows, filters, field, selected, skipOpts, onToggle, sec
 
   return (
     <div>
-      <p className="text-[10px] font-display font-semibold uppercase tracking-widest text-text-muted mb-1.5">
+      <p className="text-[11px] font-display font-semibold uppercase tracking-widest text-text-muted mb-2">
         {sectionLabel}
       </p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onToggle('__ALL__')}
-          className={`group relative overflow-hidden glass-panel rounded-md px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-toyota-red/50 min-w-[86px] ${
+          className={`group relative overflow-hidden glass-panel rounded-md px-3 py-2 text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-toyota-red/50 min-w-[104px] ${
             selected.size === 0 ? 'glow-ring' : ''
           }`}
         >
           <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-toyota-red to-transparent opacity-80" />
-          <div className="text-[8px] font-display font-semibold uppercase tracking-wider text-text-muted">Total</div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-base font-display font-semibold text-text-primary tabular-nums">{total}</span>
-            <span className="text-[9px] text-text-secondary tabular-nums">100%</span>
+          <div className="text-[10px] font-display font-semibold uppercase tracking-wider text-text-muted">Total</div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-display font-semibold text-text-primary tabular-nums">{total}</span>
+            <span className="text-[11px] text-text-secondary tabular-nums">100%</span>
           </div>
         </button>
 
@@ -87,17 +87,17 @@ export function KpiRow({ rows, filters, field, selected, skipOpts, onToggle, sec
                   ? { boxShadow: `0 0 0 1px ${signal.ring}, 0 0 14px 1px ${signal.ring.replace('0.55', '0.22')}` }
                   : undefined
               }
-              className="group relative overflow-hidden glass-panel rounded-md px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-0.5 min-w-[86px] max-w-[140px]"
+              className="group relative overflow-hidden glass-panel rounded-md px-3 py-2 text-left transition-all duration-150 hover:-translate-y-0.5 min-w-[104px] max-w-[160px]"
             >
               <span
                 className={`absolute inset-x-0 top-0 h-px ${signal.bg} opacity-70 group-hover:opacity-100 transition-opacity duration-150`}
               />
-              <div className="text-[8px] font-display font-semibold uppercase tracking-wider text-text-muted truncate">
+              <div className="text-[10px] font-display font-semibold uppercase tracking-wider text-text-muted truncate">
                 {value}
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className={`text-base font-display font-semibold tabular-nums ${signal.text}`}>{count}</span>
-                <span className="text-[9px] text-text-secondary tabular-nums">{share}%</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className={`text-xl font-display font-semibold tabular-nums ${signal.text}`}>{count}</span>
+                <span className="text-[11px] text-text-secondary tabular-nums">{share}%</span>
               </div>
             </button>
           );
