@@ -8,10 +8,18 @@ import { VehicleTable } from './components/VehicleTable';
 import { fetchDataFile, isRealtimeConfigured, type LoadState } from './lib/dataLoader';
 import { fetchLiveDataFile } from './lib/liveGraph';
 import { isMsalConfigured, ensureMsalReady, getActiveAccount, signOut } from './lib/msalAuth';
-import { makeEmptyFilterState, relativeTime, type FilterState } from './lib/filterLogic';
+import { makeEmptyFilterState, relativeTime, type ApplyFiltersOptions, type FilterState } from './lib/filterLogic';
 
 const BLOB_POLL_INTERVAL_MS = 5_000; // Azure-Function-backed real-time blob
 const GRAPH_POLL_INTERVAL_MS = 15_000; // direct-from-browser Graph calls — a bit gentler
+
+// Stable references (not recreated every render) so KpiRow's useMemo can
+// actually skip recomputation when nothing relevant changed.
+const SKIP_CTDMS: ApplyFiltersOptions = { skipCtdmsStatus: true };
+const SKIP_CUSTOMER: ApplyFiltersOptions = { skipCustomerStatus: true };
+const SKIP_MODEL: ApplyFiltersOptions = { skipColumnKey: 'model' };
+const SKIP_MFYEAR: ApplyFiltersOptions = { skipColumnKey: 'mfYear' };
+const EMPTY_SET: Set<string> = new Set();
 
 export default function App() {
   // Two independent real-time strategies, either of which may be
@@ -32,8 +40,18 @@ export default function App() {
 /** Original flow: soft passcode gate, fetches public/data.json (optionally polling an Azure Blob). */
 function PasscodeDashboard() {
   const [unlocked, setUnlocked] = useState(isUnlocked());
-  const { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus } =
-    useDashboardData(fetchDataFile);
+  const {
+    state,
+    filters,
+    setFilters,
+    now,
+    load,
+    loadSilent,
+    toggleCtdmsStatus,
+    toggleCustomerStatus,
+    toggleModel,
+    toggleMfYear,
+  } = useDashboardData(fetchDataFile);
 
   useEffect(() => {
     if (unlocked) load();
@@ -56,6 +74,8 @@ function PasscodeDashboard() {
       onFiltersChange={setFilters}
       onToggleCtdmsStatus={toggleCtdmsStatus}
       onToggleCustomerStatus={toggleCustomerStatus}
+      onToggleModel={toggleModel}
+      onToggleMfYear={toggleMfYear}
       now={now}
       onRefresh={load}
       showLiveBadge={isRealtimeConfigured}
@@ -67,8 +87,18 @@ function PasscodeDashboard() {
 function MsalDashboard() {
   const [signedIn, setSignedIn] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
-  const { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus } =
-    useDashboardData(fetchLiveDataFile);
+  const {
+    state,
+    filters,
+    setFilters,
+    now,
+    load,
+    loadSilent,
+    toggleCtdmsStatus,
+    toggleCustomerStatus,
+    toggleModel,
+    toggleMfYear,
+  } = useDashboardData(fetchLiveDataFile);
 
   // On mount: initialize MSAL, process any pending redirect response (the
   // page may have just come back from Microsoft's sign-in page), and
@@ -104,6 +134,8 @@ function MsalDashboard() {
       onFiltersChange={setFilters}
       onToggleCtdmsStatus={toggleCtdmsStatus}
       onToggleCustomerStatus={toggleCustomerStatus}
+      onToggleModel={toggleModel}
+      onToggleMfYear={toggleMfYear}
       now={now}
       onRefresh={load}
       showLiveBadge
@@ -176,7 +208,32 @@ function useDashboardData(fetcher: () => ReturnType<typeof fetchDataFile>) {
     setFilters((prev) => ({ ...prev, customerStatus: toggleSetValue(prev.customerStatus, status) }));
   }
 
-  return { state, filters, setFilters, now, load, loadSilent, toggleCtdmsStatus, toggleCustomerStatus };
+  // Model/MF. Year KPI cards are single-select (like the table's own
+  // column-filter dropdowns they share state with, unlike the status
+  // rows' multi-select toggle) — clicking the active card clears it,
+  // clicking another replaces it.
+  function toggleColumnFilter(key: 'model' | 'mfYear', value: string) {
+    setFilters((prev) => {
+      const current = prev.columnFilters[key];
+      const next = value === '__ALL__' || current === value ? undefined : value;
+      return { ...prev, columnFilters: { ...prev.columnFilters, [key]: next } };
+    });
+  }
+  const toggleModel = (value: string) => toggleColumnFilter('model', value);
+  const toggleMfYear = (value: string) => toggleColumnFilter('mfYear', value);
+
+  return {
+    state,
+    filters,
+    setFilters,
+    now,
+    load,
+    loadSilent,
+    toggleCtdmsStatus,
+    toggleCustomerStatus,
+    toggleModel,
+    toggleMfYear,
+  };
 }
 
 function Dashboard({
@@ -185,6 +242,8 @@ function Dashboard({
   onFiltersChange,
   onToggleCtdmsStatus,
   onToggleCustomerStatus,
+  onToggleModel,
+  onToggleMfYear,
   now,
   onRefresh,
   showLiveBadge,
@@ -196,6 +255,8 @@ function Dashboard({
   onFiltersChange: (f: FilterState) => void;
   onToggleCtdmsStatus: (status: string) => void;
   onToggleCustomerStatus: (status: string) => void;
+  onToggleModel: (value: string) => void;
+  onToggleMfYear: (value: string) => void;
   now: number;
   onRefresh: () => void;
   showLiveBadge: boolean;
@@ -219,24 +280,44 @@ function Dashboard({
         {state.status === 'error' && <ErrorState message={state.message} onRetry={onRefresh} />}
         {state.status === 'ready' && (
           <>
-            <KpiRow
-              rows={state.data.rows}
-              filters={filters}
-              field="ctdmsStatus"
-              selected={filters.ctdmsStatus}
-              skipCtdmsStatus
-              onToggle={onToggleCtdmsStatus}
-              sectionLabel="CTDMS Status"
-            />
-            <KpiRow
-              rows={state.data.rows}
-              filters={filters}
-              field="customerStatus"
-              selected={filters.customerStatus}
-              skipCustomerStatus
-              onToggle={onToggleCustomerStatus}
-              sectionLabel="Customer Status"
-            />
+            <div className="glass-panel rounded-lg p-3 flex flex-col gap-3">
+              <KpiRow
+                rows={state.data.rows}
+                filters={filters}
+                field="ctdmsStatus"
+                selected={filters.ctdmsStatus}
+                skipOpts={SKIP_CTDMS}
+                onToggle={onToggleCtdmsStatus}
+                sectionLabel="CTDMS Status"
+              />
+              <KpiRow
+                rows={state.data.rows}
+                filters={filters}
+                field="customerStatus"
+                selected={filters.customerStatus}
+                skipOpts={SKIP_CUSTOMER}
+                onToggle={onToggleCustomerStatus}
+                sectionLabel="Customer Status"
+              />
+              <KpiRow
+                rows={state.data.rows}
+                filters={filters}
+                field="model"
+                selected={filters.columnFilters.model ? new Set([filters.columnFilters.model]) : EMPTY_SET}
+                skipOpts={SKIP_MODEL}
+                onToggle={onToggleModel}
+                sectionLabel="Model"
+              />
+              <KpiRow
+                rows={state.data.rows}
+                filters={filters}
+                field="mfYear"
+                selected={filters.columnFilters.mfYear ? new Set([filters.columnFilters.mfYear]) : EMPTY_SET}
+                skipOpts={SKIP_MFYEAR}
+                onToggle={onToggleMfYear}
+                sectionLabel="MF. Year"
+              />
+            </div>
             <FilterPanel rows={state.data.rows} filters={filters} onChange={onFiltersChange} />
             <VehicleTable allRows={state.data.rows} filters={filters} onFiltersChange={onFiltersChange} />
           </>

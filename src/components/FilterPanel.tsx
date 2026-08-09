@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { VehicleRow } from '../types';
 import type { FilterState } from '../lib/filterLogic';
-import { distinctValues, isFilterStateEmpty } from '../lib/filterLogic';
-import { MultiSelect } from './MultiSelect';
+import { isFilterStateEmpty } from '../lib/filterLogic';
 import { DateRangeField } from './DateRangeField';
 
 interface Props {
@@ -11,11 +10,10 @@ interface Props {
   onChange: (next: FilterState) => void;
 }
 
-export function FilterPanel({ rows, filters, onChange }: Props) {
+// CTDMS Status and Customer Status now have their own clickable KPI cards
+// above (see App.tsx's Dashboard) — no need for a duplicate dropdown here.
+export function FilterPanel({ filters, onChange }: Props) {
   const [dateSectionOpen, setDateSectionOpen] = useState(false);
-
-  const ctdmsOptions = useMemo(() => distinctValues(rows, 'ctdmsStatus'), [rows]);
-  const customerOptions = useMemo(() => distinctValues(rows, 'customerStatus'), [rows]);
 
   const dateRangeCount = Object.values(filters.dateRanges).filter((r) => r.from || r.to).length;
 
@@ -36,41 +34,12 @@ export function FilterPanel({ rows, filters, onChange }: Props) {
   }
 
   return (
-    <div className="glass-panel rounded-lg p-4 flex flex-col gap-4">
+    <div className="glass-panel rounded-lg p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-widest text-text-primary">
-          Filters
-        </h2>
-        {!isFilterStateEmpty(filters) && (
-          <button
-            onClick={clearAll}
-            className="text-xs text-toyota-red hover:text-white hover:bg-toyota-red transition-colors duration-150 border border-toyota-red/50 rounded px-2 py-1"
-          >
-            Clear all filters
-          </button>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <MultiSelect
-          label="CTDMS Status"
-          options={ctdmsOptions}
-          selected={filters.ctdmsStatus}
-          onChange={(next) => onChange({ ...filters, ctdmsStatus: next })}
-        />
-        <MultiSelect
-          label="Customer Status"
-          options={customerOptions}
-          selected={filters.customerStatus}
-          onChange={(next) => onChange({ ...filters, customerStatus: next })}
-        />
-      </div>
-
-      <div>
         <button
           type="button"
           onClick={() => setDateSectionOpen((o) => !o)}
-          className="w-full flex items-center justify-between text-sm text-text-secondary hover:text-text-primary transition-colors duration-150"
+          className="flex-1 flex items-center justify-between text-sm text-text-secondary hover:text-text-primary transition-colors duration-150"
         >
           <span className="flex items-center gap-2">
             Date filters
@@ -92,40 +61,42 @@ export function FilterPanel({ rows, filters, onChange }: Props) {
             />
           </svg>
         </button>
-
-        {dateSectionOpen && (
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <DateRangeField
-              label="Invoice Date"
-              value={filters.dateRanges.invoiceDate}
-              onChange={(next) =>
-                onChange({ ...filters, dateRanges: { ...filters.dateRanges, invoiceDate: next } })
-              }
-            />
-            <DateRangeField
-              label="EST Delivery Date"
-              value={filters.dateRanges.estDeliveryDate}
-              onChange={(next) =>
-                onChange({ ...filters, dateRanges: { ...filters.dateRanges, estDeliveryDate: next } })
-              }
-            />
-            <DateRangeField
-              label="DN Date"
-              value={filters.dateRanges.dnDate}
-              onChange={(next) =>
-                onChange({ ...filters, dateRanges: { ...filters.dateRanges, dnDate: next } })
-              }
-            />
-            <DateRangeField
-              label="Delivery Date"
-              value={filters.dateRanges.deliveryDate}
-              onChange={(next) =>
-                onChange({ ...filters, dateRanges: { ...filters.dateRanges, deliveryDate: next } })
-              }
-            />
-          </div>
+        {!isFilterStateEmpty(filters) && (
+          <button
+            onClick={clearAll}
+            className="ml-3 shrink-0 text-xs text-toyota-red hover:text-white hover:bg-toyota-red transition-colors duration-150 border border-toyota-red/50 rounded px-2 py-1"
+          >
+            Clear all filters
+          </button>
         )}
       </div>
+
+      {dateSectionOpen && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <DateRangeField
+            label="Invoice Date"
+            value={filters.dateRanges.invoiceDate}
+            onChange={(next) => onChange({ ...filters, dateRanges: { ...filters.dateRanges, invoiceDate: next } })}
+          />
+          <DateRangeField
+            label="EST Delivery Date"
+            value={filters.dateRanges.estDeliveryDate}
+            onChange={(next) =>
+              onChange({ ...filters, dateRanges: { ...filters.dateRanges, estDeliveryDate: next } })
+            }
+          />
+          <DateRangeField
+            label="DN Date"
+            value={filters.dateRanges.dnDate}
+            onChange={(next) => onChange({ ...filters, dateRanges: { ...filters.dateRanges, dnDate: next } })}
+          />
+          <DateRangeField
+            label="Delivery Date"
+            value={filters.dateRanges.deliveryDate}
+            onChange={(next) => onChange({ ...filters, dateRanges: { ...filters.dateRanges, deliveryDate: next } })}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -81,6 +81,8 @@ export interface ApplyFiltersOptions {
   skipCtdmsStatus?: boolean;
   /** Same idea, for the Customer Status KPI row. */
   skipCustomerStatus?: boolean;
+  /** Same idea, for a single-select column-filter-backed KPI row (Model, MF. Year). */
+  skipColumnKey?: ColumnKey;
 }
 
 /**
@@ -110,6 +112,7 @@ export function applyFilters(
   });
 
   for (const col of TABLE_COLUMNS) {
+    if (col.key === opts.skipColumnKey) continue;
     const val = filters.columnFilters[col.key];
     if (!val || val.trim() === '') continue;
     if (col.kind === 'select') {

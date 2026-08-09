@@ -1,16 +1,15 @@
 import { useMemo } from 'react';
 import type { VehicleRow } from '../types';
-import type { FilterState } from '../lib/filterLogic';
+import type { ApplyFiltersOptions, FilterState } from '../lib/filterLogic';
 import { applyFilters, distinctValues } from '../lib/filterLogic';
 
 interface Props {
   rows: VehicleRow[];
   filters: FilterState;
-  field: 'ctdmsStatus' | 'customerStatus';
+  field: keyof VehicleRow;
   selected: Set<string>;
-  /** Which of the two status facets to exclude from THIS row's own scoping — always its own field, so a card's count reflects everything else currently filtered (including the table's column filters/search), not itself. */
-  skipCtdmsStatus?: boolean;
-  skipCustomerStatus?: boolean;
+  /** How this row's own dimension should be excluded from its own scoping — see ApplyFiltersOptions. */
+  skipOpts: ApplyFiltersOptions;
   onToggle: (value: string) => void;
   sectionLabel: string;
 }
@@ -26,36 +25,27 @@ const SIGNAL_COLORS = [
 ];
 
 /**
- * A row of clickable KPI cards for one status dimension (CTDMS or
- * Customer Status). Scoped by every OTHER active filter — the top panel's
- * status/date filters AND the table's per-column filters/search — so
+ * A row of compact, clickable KPI cards for one dimension (CTDMS Status,
+ * Customer Status, Model, MF. Year, ...). Scoped by every OTHER active
+ * filter — status/date filters, other column filters, and search — so
  * these counts always match what's actually visible in the table below,
  * except for this row's own dimension (self-excluding facet counts, so
- * selecting a card doesn't make its own count vanish).
+ * selecting a card doesn't zero out its own count). Cards wrap onto as
+ * few rows as fit the viewport rather than a fixed grid, so dimensions
+ * with many distinct values (e.g. Model) still stay compact.
  */
-export function KpiRow({
-  rows,
-  filters,
-  field,
-  selected,
-  skipCtdmsStatus,
-  skipCustomerStatus,
-  onToggle,
-  sectionLabel,
-}: Props) {
-  const scoped = useMemo(
-    () => applyFilters(rows, filters, { skipCtdmsStatus, skipCustomerStatus }),
-    [rows, filters, skipCtdmsStatus, skipCustomerStatus],
-  );
+export function KpiRow({ rows, filters, field, selected, skipOpts, onToggle, sectionLabel }: Props) {
+  const scoped = useMemo(() => applyFilters(rows, filters, skipOpts), [rows, filters, skipOpts]);
 
-  const statuses = useMemo(() => distinctValues(scoped, field), [scoped, field]);
+  const values = useMemo(() => distinctValues(scoped, field), [scoped, field]);
 
   const counts = useMemo(() => {
     const m = new Map<string, number>();
     for (const row of scoped) {
       const v = row[field];
       if (!v) continue;
-      m.set(v, (m.get(v) ?? 0) + 1);
+      const key = String(v);
+      m.set(key, (m.get(key) ?? 0) + 1);
     }
     return m;
   }, [scoped, field]);
@@ -64,55 +54,51 @@ export function KpiRow({
 
   return (
     <div>
-      <p className="text-[11px] font-display font-semibold uppercase tracking-widest text-text-muted mb-2">
+      <p className="text-[10px] font-display font-semibold uppercase tracking-widest text-text-muted mb-1.5">
         {sectionLabel}
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="flex flex-wrap gap-1.5">
         <button
           onClick={() => onToggle('__ALL__')}
-          className={`group relative overflow-hidden glass-panel rounded-lg p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-toyota-red/50 ${
+          className={`group relative overflow-hidden glass-panel rounded-md px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-toyota-red/50 min-w-[86px] ${
             selected.size === 0 ? 'glow-ring' : ''
           }`}
         >
-          <span className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-toyota-red to-transparent opacity-80" />
-          <div className="text-[11px] font-display font-semibold uppercase tracking-widest text-text-muted mb-1">
-            Total
+          <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-toyota-red to-transparent opacity-80" />
+          <div className="text-[8px] font-display font-semibold uppercase tracking-wider text-text-muted">Total</div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-base font-display font-semibold text-text-primary tabular-nums">{total}</span>
+            <span className="text-[9px] text-text-secondary tabular-nums">100%</span>
           </div>
-          <div className="text-3xl font-display font-semibold text-text-primary tabular-nums">
-            {total}
-          </div>
-          <div className="text-xs text-text-secondary mt-0.5 tabular-nums">100%</div>
         </button>
 
-        {statuses.map((status, i) => {
-          const count = counts.get(status) ?? 0;
+        {values.map((value, i) => {
+          const count = counts.get(value) ?? 0;
           const share = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-          const active = selected.has(status);
+          const active = selected.has(value);
           const signal = SIGNAL_COLORS[i % SIGNAL_COLORS.length];
           return (
             <button
-              key={status}
-              onClick={() => onToggle(status)}
+              key={value}
+              onClick={() => onToggle(value)}
+              title={value}
               style={
                 active
-                  ? { boxShadow: `0 0 0 1px ${signal.ring}, 0 0 20px 2px ${signal.ring.replace('0.55', '0.25')}` }
+                  ? { boxShadow: `0 0 0 1px ${signal.ring}, 0 0 14px 1px ${signal.ring.replace('0.55', '0.22')}` }
                   : undefined
               }
-              className="group relative overflow-hidden glass-panel rounded-lg p-4 text-left transition-all duration-200 hover:-translate-y-0.5"
+              className="group relative overflow-hidden glass-panel rounded-md px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-0.5 min-w-[86px] max-w-[140px]"
             >
               <span
-                className={`absolute inset-x-0 top-0 h-[2px] ${signal.bg} opacity-70 group-hover:opacity-100 transition-opacity duration-200`}
+                className={`absolute inset-x-0 top-0 h-px ${signal.bg} opacity-70 group-hover:opacity-100 transition-opacity duration-150`}
               />
-              <div
-                className="text-[11px] font-display font-semibold uppercase tracking-widest text-text-muted mb-1 truncate"
-                title={status}
-              >
-                {status}
+              <div className="text-[8px] font-display font-semibold uppercase tracking-wider text-text-muted truncate">
+                {value}
               </div>
-              <div className={`text-3xl font-display font-semibold tabular-nums ${signal.text}`}>
-                {count}
+              <div className="flex items-baseline gap-1">
+                <span className={`text-base font-display font-semibold tabular-nums ${signal.text}`}>{count}</span>
+                <span className="text-[9px] text-text-secondary tabular-nums">{share}%</span>
               </div>
-              <div className="text-xs text-text-secondary mt-0.5 tabular-nums">{share}%</div>
             </button>
           );
         })}
