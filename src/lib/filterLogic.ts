@@ -7,7 +7,7 @@ export interface DateRangeFilter {
 
 export const EMPTY_RANGE: DateRangeFilter = { from: null, to: null };
 
-/** The 4 table columns that carry their own per-column filter/search value. */
+/** Table columns, each with its own per-column filter/search control. */
 export const TABLE_COLUMNS = [
   { key: 'customerName', label: 'Customer Name', kind: 'text' as const },
   { key: 'chassis', label: 'Chassis', kind: 'text' as const },
@@ -21,6 +21,7 @@ export const TABLE_COLUMNS = [
   { key: 'intColour', label: 'Int. Colour', kind: 'select' as const },
   { key: 'soName', label: 'SO Name', kind: 'select' as const },
   { key: 'tlName', label: 'TL Name', kind: 'select' as const },
+  { key: 'exShowroom', label: 'Ex-Showroom', kind: 'text' as const },
 ] satisfies { key: keyof VehicleRow; label: string; kind: 'text' | 'select' }[];
 
 export type ColumnKey = (typeof TABLE_COLUMNS)[number]['key'];

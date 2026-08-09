@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessGate, isUnlocked } from './components/AccessGate';
 import { SignInGate } from './components/SignInGate';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { KpiRow } from './components/KpiRow';
 import { FilterPanel } from './components/FilterPanel';
 import { VehicleTable } from './components/VehicleTable';
@@ -20,10 +21,12 @@ export default function App() {
   //   2. Blob: Azure Function polls Graph server-side, browser polls a
   //      public blob it writes to.
   // MSAL takes priority if both happen to be configured.
-  if (isMsalConfigured) {
-    return <MsalDashboard />;
-  }
-  return <PasscodeDashboard />;
+  return (
+    <>
+      <ThemeSwitcher />
+      {isMsalConfigured ? <MsalDashboard /> : <PasscodeDashboard />}
+    </>
+  );
 }
 
 /** Original flow: soft passcode gate, fetches public/data.json (optionally polling an Azure Blob). */

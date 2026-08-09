@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* Toyota-red HUD palette — lifted off pure-black into a cooler graphite
-     so panels read as lit surfaces, not a void. */
+  /* DEFAULT theme = "Toyota Red" (dark). Every other theme (see the
+     [data-theme] blocks below) just overrides these same custom
+     property values — Tailwind generates utilities (bg-toyota-red,
+     text-signal-cyan, etc.) from these token NAMES once, so switching
+     themes never requires touching component class names, only values. */
   --color-toyota-red: #ff1f39;
   --color-toyota-red-dim: #b3132a;
   --color-toyota-red-glow: #ff5468;
@@ -17,7 +20,7 @@
   --color-text-secondary: #a7b0c4;
   --color-text-muted: #6d7690;
 
-  /* Secondary HUD accent — used sparingly to break red-monotony on
+  /* Secondary HUD accent — used sparingly to break accent-monotony on
      data/status elements (fleet-ops "signal" colors). */
   --color-signal-cyan: #22d3ee;
   --color-signal-amber: #fbbf24;
@@ -31,6 +34,113 @@
 
 :root {
   color-scheme: dark;
+}
+
+/* ============================================================
+   THEMES — see src/lib/theme.ts for the switcher UI + persistence.
+   The extra `html` type selector bumps specificity above the bare
+   `:root` pseudo-class Tailwind's @theme output uses, so these reliably
+   win regardless of stylesheet source order.
+   ============================================================ */
+
+/* Cyber Violet (dark) */
+html[data-theme='cyber-violet'] {
+  color-scheme: dark;
+  --color-toyota-red: #b537f2;
+  --color-toyota-red-dim: #7c239e;
+  --color-toyota-red-glow: #d67dff;
+  --color-bg-void: #0d0a1a;
+  --color-bg-panel: #17122b;
+  --color-bg-raised: #1f1938;
+  --color-border-steel: #332b52;
+  --color-border-steel-bright: #4a3d74;
+  --color-text-primary: #f2eefc;
+  --color-text-secondary: #b6a9dc;
+  --color-text-muted: #7c6ea3;
+  --color-signal-cyan: #22d3ee;
+  --color-signal-amber: #fbbf24;
+  --color-signal-emerald: #34d399;
+  --color-signal-violet: #ff6ec7;
+}
+
+/* Neon Cyan (dark) */
+html[data-theme='neon-cyan'] {
+  color-scheme: dark;
+  --color-toyota-red: #00e5ff;
+  --color-toyota-red-dim: #00a3b8;
+  --color-toyota-red-glow: #6df3ff;
+  --color-bg-void: #060f14;
+  --color-bg-panel: #0c1c24;
+  --color-bg-raised: #112833;
+  --color-border-steel: #1e3a47;
+  --color-border-steel-bright: #2c5567;
+  --color-text-primary: #eafbff;
+  --color-text-secondary: #9fc9d6;
+  --color-text-muted: #5f8b98;
+  --color-signal-cyan: #60a5fa;
+  --color-signal-amber: #fbbf24;
+  --color-signal-emerald: #34d399;
+  --color-signal-violet: #a78bfa;
+}
+
+/* Toyota Light (light) — brand-consistent light mode */
+html[data-theme='toyota-light'] {
+  color-scheme: light;
+  --color-toyota-red: #eb0a1e;
+  --color-toyota-red-dim: #a40815;
+  --color-toyota-red-glow: #ff4d5e;
+  --color-bg-void: #f4f5f7;
+  --color-bg-panel: #ffffff;
+  --color-bg-raised: #ffffff;
+  --color-border-steel: #dfe2e8;
+  --color-border-steel-bright: #c3c8d2;
+  --color-text-primary: #14171f;
+  --color-text-secondary: #4b5163;
+  --color-text-muted: #848b9c;
+  --color-signal-cyan: #0891b2;
+  --color-signal-amber: #d97706;
+  --color-signal-emerald: #059669;
+  --color-signal-violet: #7c3aed;
+}
+
+/* Solar Amber (light) */
+html[data-theme='solar-amber'] {
+  color-scheme: light;
+  --color-toyota-red: #e8790a;
+  --color-toyota-red-dim: #a8570a;
+  --color-toyota-red-glow: #ffab4d;
+  --color-bg-void: #fbf7f0;
+  --color-bg-panel: #ffffff;
+  --color-bg-raised: #fffaf3;
+  --color-border-steel: #ecdfc9;
+  --color-border-steel-bright: #d8c49f;
+  --color-text-primary: #241a08;
+  --color-text-secondary: #5c4a2e;
+  --color-text-muted: #8f7a58;
+  --color-signal-cyan: #0891b2;
+  --color-signal-amber: #92700a;
+  --color-signal-emerald: #059669;
+  --color-signal-violet: #7c3aed;
+}
+
+/* Pearl Blue (light) */
+html[data-theme='pearl-blue'] {
+  color-scheme: light;
+  --color-toyota-red: #0071e3;
+  --color-toyota-red-dim: #0052a3;
+  --color-toyota-red-glow: #4da2ff;
+  --color-bg-void: #f2f6fb;
+  --color-bg-panel: #ffffff;
+  --color-bg-raised: #ffffff;
+  --color-border-steel: #d9e3f0;
+  --color-border-steel-bright: #b9cbe3;
+  --color-text-primary: #0d1b2e;
+  --color-text-secondary: #3c4f68;
+  --color-text-muted: #7c8ba3;
+  --color-signal-cyan: #0891b2;
+  --color-signal-amber: #d97706;
+  --color-signal-emerald: #059669;
+  --color-signal-violet: #7c3aed;
 }
 
 html,
@@ -51,15 +161,17 @@ body {
 }
 
 /* HUD radar-grid backdrop: faint blueprint grid + drifting glow blobs.
-   Fixed + behind everything (z-index -2/-1) so panels sit "lit" on top. */
+   Fixed + behind everything (z-index -2/-1) so panels sit "lit" on top.
+   Colors are theme-relative (color-mix against each theme's own accent /
+   signal-cyan), so every theme gets this effect automatically. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -2;
   background-image:
-    linear-gradient(rgba(255, 31, 57, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 31, 57, 0.055) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--color-toyota-red) 5.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-toyota-red) 5.5%, transparent) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
 }
@@ -70,9 +182,9 @@ body::after {
   inset: 0;
   z-index: -1;
   background-image:
-    radial-gradient(circle at 12% -5%, rgba(255, 31, 57, 0.22), transparent 42%),
-    radial-gradient(circle at 92% 8%, rgba(34, 211, 238, 0.14), transparent 38%),
-    radial-gradient(circle at 50% 105%, rgba(255, 31, 57, 0.12), transparent 45%);
+    radial-gradient(circle at 12% -5%, color-mix(in srgb, var(--color-toyota-red) 22%, transparent), transparent 42%),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--color-signal-cyan) 14%, transparent), transparent 38%),
+    radial-gradient(circle at 50% 105%, color-mix(in srgb, var(--color-toyota-red) 12%, transparent), transparent 45%);
   animation: drift 22s ease-in-out infinite alternate;
 }
 
@@ -90,7 +202,7 @@ body::after {
 }
 
 ::selection {
-  background: rgba(255, 31, 57, 0.35);
+  background: color-mix(in srgb, var(--color-toyota-red) 35%, transparent);
   color: #fff;
 }
 
@@ -114,7 +226,11 @@ body::after {
    like an instrument-cluster tile. */
 .glass-panel {
   position: relative;
-  background: linear-gradient(180deg, rgba(27, 33, 48, 0.82) 0%, rgba(20, 24, 36, 0.78) 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-bg-raised) 82%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg-panel) 78%, transparent) 100%
+  );
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border-steel);
@@ -130,7 +246,12 @@ body::after {
   left: 12px;
   right: 12px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 31, 57, 0.55), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-toyota-red) 55%, transparent),
+    transparent
+  );
 }
 
 .hairline {
@@ -138,25 +259,25 @@ body::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 31, 57, 0.45),
+    color-mix(in srgb, var(--color-toyota-red) 45%, transparent),
     transparent
   );
 }
 
 .glow-ring {
   box-shadow:
-    0 0 0 1px rgba(255, 31, 57, 0.6),
-    0 0 20px 2px rgba(255, 31, 57, 0.28);
+    0 0 0 1px color-mix(in srgb, var(--color-toyota-red) 60%, transparent),
+    0 0 20px 2px color-mix(in srgb, var(--color-toyota-red) 28%, transparent);
 }
 
 /* Slow breathing glow for "live" indicators (status dot, gate icon). */
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-signal-emerald) 55%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-signal-emerald) 0%, transparent);
   }
 }
 .pulse-dot {
@@ -172,6 +293,11 @@ button {
 input[type='date']::-webkit-calendar-picker-indicator {
   filter: invert(0.75);
   cursor: pointer;
+}
+html[data-theme='toyota-light'] input[type='date']::-webkit-calendar-picker-indicator,
+html[data-theme='solar-amber'] input[type='date']::-webkit-calendar-picker-indicator,
+html[data-theme='pearl-blue'] input[type='date']::-webkit-calendar-picker-indicator {
+  filter: none;
 }
 
 .font-display {

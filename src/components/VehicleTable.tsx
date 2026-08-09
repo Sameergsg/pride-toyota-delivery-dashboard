@@ -77,7 +77,7 @@ export function VehicleTable({ allRows, filters, onFiltersChange }: Props) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse min-w-[1100px]">
+        <table className="w-full text-sm border-collapse min-w-[1220px]">
           <thead>
             <tr className="border-b border-border-steel">
               {TABLE_COLUMNS.map((col) => (

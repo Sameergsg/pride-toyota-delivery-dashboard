@@ -16,6 +16,20 @@
       rel="stylesheet"
     />
     <title>Pride Toyota — Delivery Dashboard</title>
+    <script>
+      // Applies the saved theme before first paint, so there's no flash
+      // of the default dark theme before React mounts (see src/lib/theme.ts
+      // for the actual theme list — kept in sync with the ids below only
+      // in the sense that an unrecognized/missing value harmlessly no-ops).
+      (function () {
+        try {
+          var saved = localStorage.getItem('ptd-dashboard-theme');
+          if (saved && saved !== 'toyota-red') {
+            document.documentElement.setAttribute('data-theme', saved);
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
