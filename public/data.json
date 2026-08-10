@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-10T08:20:41.857Z",
+  "generatedAt": "2026-08-10T09:54:20.976Z",
   "rows": [
     {
       "srNo": "1",
@@ -22214,8 +22214,8 @@
       "variant": "GX(O) 7S",
       "colour": "PLATINUM WHITE PEARL",
       "intColour": "2 TONE ASH BROWN",
-      "tlName": "CEO SIR",
-      "soName": "CEO SIR",
+      "tlName": "LILADHAR",
+      "soName": "LILADHAR",
       "customerName": "MITESH AGGARWAL",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
@@ -22224,10 +22224,10 @@
       "dnDate": null,
       "deliveryDate": null,
       "stockStatus": "PHYSICAL",
-      "reference": null,
+      "reference": "SUMIT SIR",
       "tfsPaymentDate": null,
       "exShowroom": "2097000",
-      "rtoName": null,
+      "rtoName": "HISAR",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
