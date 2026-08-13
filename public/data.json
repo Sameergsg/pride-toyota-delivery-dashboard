@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-13T08:10:55.113Z",
+  "generatedAt": "2026-08-13T09:37:39.418Z",
   "rows": [
     {
       "srNo": "1",
@@ -20417,13 +20417,13 @@
       "tlName": "LILADHAR",
       "soName": "SAURAV",
       "customerName": "MAMTA RANI",
-      "ctdmsStatus": "BND",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-13",
+      "ctdmsStatus": "UPDATING",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000366",
       "dnDate": "2026-06-29",
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "deliveryDate": "2026-08-13",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1077000",
