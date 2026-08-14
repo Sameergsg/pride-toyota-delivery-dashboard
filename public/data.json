@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-14T09:32:16.603Z",
+  "generatedAt": "2026-08-14T10:47:19.184Z",
   "rows": [
     {
       "srNo": "1",
@@ -20624,11 +20624,11 @@
       "variant": "GX 8S",
       "colour": "SUPER WHITE",
       "intColour": "BLACK",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "AMAN",
+      "customerName": "JONY",
       "ctdmsStatus": "BND",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000260",
       "dnDate": "2026-04-30",
