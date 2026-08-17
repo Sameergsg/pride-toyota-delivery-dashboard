@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-17T12:19:19.512Z",
+  "generatedAt": "2026-08-17T13:13:14.114Z",
   "rows": [
     {
       "srNo": "1",
@@ -22427,13 +22427,13 @@
       "tlName": "BIJENDER",
       "soName": "BIJENDER",
       "customerName": "DHEERAJ",
-      "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-17",
+      "ctdmsStatus": "INVOICE",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000416",
-      "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "dnDate": "2026-08-17",
+      "deliveryDate": "2026-08-17",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "845000",
