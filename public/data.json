@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-17T05:57:19.783Z",
+  "generatedAt": "2026-08-17T06:39:50.760Z",
   "rows": [
     {
       "srNo": "1",
@@ -14364,10 +14364,10 @@
       "dnDate": "2026-08-14",
       "deliveryDate": "2026-08-14",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "LILADHAR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "3184000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": null
     },
@@ -14904,10 +14904,10 @@
       "dnDate": "2026-08-14",
       "deliveryDate": "2026-08-14",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "LILADHAR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "3761000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": null
     },
@@ -21444,10 +21444,10 @@
       "dnDate": "2026-06-29",
       "deliveryDate": "2026-08-14",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "SAHIL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "2097000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": null
     },
@@ -22254,10 +22254,10 @@
       "dnDate": "2026-08-14",
       "deliveryDate": "2026-08-14",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "SAHIL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "3761000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": null
     },
@@ -22377,7 +22377,7 @@
       "reference": "SAURAV",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1077000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
