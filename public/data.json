@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T10:16:31.076Z",
+  "generatedAt": "2026-08-18T10:52:36.071Z",
   "rows": [
     {
       "srNo": "1",
@@ -20054,11 +20054,11 @@
       "variant": "S",
       "colour": "MIDNIGHT BLACK",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "AJIT",
+      "customerName": "OM TRADERS",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
@@ -22698,7 +22698,7 @@
       "soName": "AJIT",
       "customerName": "M/s New Delhi spare centre",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "HOLD",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
