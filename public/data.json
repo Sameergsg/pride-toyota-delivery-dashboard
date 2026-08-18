@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T10:52:36.071Z",
+  "generatedAt": "2026-08-18T11:14:54.663Z",
   "rows": [
     {
       "srNo": "1",
@@ -9949,7 +9949,7 @@
       "customerName": "DEEPAK KUMAR",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-08-22",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -20059,7 +20059,7 @@
       "customerName": "OM TRADERS",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-08-19",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -22699,7 +22699,7 @@
       "customerName": "M/s New Delhi spare centre",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-08-20",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
