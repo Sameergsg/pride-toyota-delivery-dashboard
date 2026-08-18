@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T03:14:07.681Z",
+  "generatedAt": "2026-08-18T04:03:25.057Z",
   "rows": [
     {
       "srNo": "1",
@@ -21824,12 +21824,12 @@
       "variant": "S",
       "colour": "MIDNIGHT BLACK",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "NITISH",
+      "customerName": "SANDEEP",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-08-19",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
