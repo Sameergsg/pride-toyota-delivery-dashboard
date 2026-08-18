@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T12:21:13.739Z",
+  "generatedAt": "2026-08-18T13:15:58.058Z",
   "rows": [
     {
       "srNo": "1",
@@ -21524,12 +21524,12 @@
       "variant": "G",
       "colour": "CAFE WHITE",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "NITISH",
+      "customerName": "RAJU MEHRA",
       "ctdmsStatus": "BND",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-08-22",
       "ctdmsInvoice": "INV261000119",
       "dnDate": "2026-02-28",
       "deliveryDate": null,
