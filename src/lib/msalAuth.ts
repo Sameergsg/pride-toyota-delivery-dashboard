@@ -85,10 +85,22 @@ export async function signOut(): Promise<void> {
   }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Gets a Graph access token, silently refreshing if there's already a
- * signed-in account. If interactive sign-in is required (token fully
- * expired, no session), redirects — same caveat as signIn() above.
+ * signed-in account. If interactive sign-in is genuinely required (token
+ * expired with no valid session — MSAL is certain, via
+ * InteractionRequiredAuthError), redirects to sign in again.
+ *
+ * A plain `timed_out` (MSAL's silent renewal — sometimes iframe-based —
+ * taking too long, e.g. a slow network response or a browser blocking
+ * third-party storage access) does NOT mean re-auth is needed, so instead
+ * of surfacing it immediately we retry silently a couple of times first;
+ * it's usually transient. Only genuinely stuck timeouts propagate up to
+ * the caller's error UI.
  */
 export async function getAccessToken(): Promise<string> {
   const app = await ensureMsalReady();
@@ -96,15 +108,26 @@ export async function getAccessToken(): Promise<string> {
   if (!account) {
     throw new Error('Not signed in.');
   }
-  try {
-    const result = await app.acquireTokenSilent({ scopes: SCOPES, account });
-    return result.accessToken;
-  } catch (err) {
-    if (err instanceof InteractionRequiredAuthError) {
-      await app.acquireTokenRedirect({ scopes: SCOPES });
-      // Navigates away — nothing after this line runs in this page load.
-      throw new Error('Redirecting to sign in again…');
+
+  const MAX_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const result = await app.acquireTokenSilent({ scopes: SCOPES, account });
+      return result.accessToken;
+    } catch (err) {
+      if (err instanceof InteractionRequiredAuthError) {
+        await app.acquireTokenRedirect({ scopes: SCOPES });
+        // Navigates away — nothing after this line runs in this page load.
+        throw new Error('Redirecting to sign in again…');
+      }
+      const code = (err as { errorCode?: string })?.errorCode;
+      if (code === 'timed_out' && attempt < MAX_ATTEMPTS) {
+        await sleep(attempt * 800);
+        continue;
+      }
+      throw err;
     }
-    throw err;
   }
+  // Unreachable (loop always returns or throws), but keeps TS satisfied.
+  throw new Error('Failed to acquire access token.');
 }
