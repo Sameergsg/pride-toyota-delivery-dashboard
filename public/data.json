@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T09:55:27.755Z",
+  "generatedAt": "2026-08-19T10:17:33.788Z",
   "rows": [
     {
       "srNo": "1",
@@ -10334,12 +10334,12 @@
       "variant": "S",
       "colour": "CAFE WHITE",
       "intColour": "BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "LILADHAR",
+      "customerName": "SANJAY KUMAR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-08-21",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
