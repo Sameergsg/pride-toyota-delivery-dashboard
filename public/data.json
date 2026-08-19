@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T04:59:27.109Z",
+  "generatedAt": "2026-08-19T05:28:51.828Z",
   "rows": [
     {
       "srNo": "1",
@@ -14507,7 +14507,7 @@
       "tlName": "SAHIL",
       "soName": "KUNAL",
       "customerName": "SHER SINGH SHRAN",
-      "ctdmsStatus": "BND",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": "2026-08-19",
       "ctdmsInvoice": "INV261000262",
@@ -15617,7 +15617,7 @@
       "tlName": "SAHIL",
       "soName": "KUNAL",
       "customerName": "SHER SINGH SHRAN",
-      "ctdmsStatus": "BND",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": "2026-08-19",
       "ctdmsInvoice": "INV261000261",
@@ -17089,7 +17089,7 @@
       "customerName": "VED PAL",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-20",
+      "estDeliveryDate": "2026-08-21",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -21529,7 +21529,7 @@
       "customerName": "RAJU MEHRA",
       "ctdmsStatus": "BND",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-22",
+      "estDeliveryDate": "2026-08-21",
       "ctdmsInvoice": "INV261000119",
       "dnDate": "2026-02-28",
       "deliveryDate": null,
