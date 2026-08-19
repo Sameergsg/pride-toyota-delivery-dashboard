@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T10:17:33.788Z",
+  "generatedAt": "2026-08-19T10:52:01.182Z",
   "rows": [
     {
       "srNo": "1",
@@ -13067,13 +13067,13 @@
       "tlName": "AJIT",
       "soName": "NITISH",
       "customerName": "SANDEEP",
-      "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-19",
-      "ctdmsInvoice": null,
-      "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "ctdmsStatus": "INVOICE",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
+      "ctdmsInvoice": "INV261000417",
+      "dnDate": "2026-08-19",
+      "deliveryDate": "2026-08-19",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1371000",
