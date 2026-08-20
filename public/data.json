@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T05:32:27.683Z",
+  "generatedAt": "2026-08-20T06:24:48.144Z",
   "rows": [
     {
       "srNo": "1",
@@ -10307,7 +10307,7 @@
       "tlName": "SANJAY",
       "soName": "SANJAY",
       "customerName": "MANISH KUMAR",
-      "ctdmsStatus": "UPDATING",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000308",
@@ -18349,7 +18349,7 @@
       "customerName": "SUBHAM GOYAL",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-20",
+      "estDeliveryDate": "2026-08-21",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
