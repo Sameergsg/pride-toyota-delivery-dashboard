@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T07:14:29.836Z",
+  "generatedAt": "2026-08-20T08:02:11.011Z",
   "rows": [
     {
       "srNo": "1",
@@ -22699,7 +22699,7 @@
       "customerName": "JONY",
       "ctdmsStatus": "BND",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-09-29",
+      "estDeliveryDate": "2026-08-29",
       "ctdmsInvoice": "INV261000260",
       "dnDate": "2026-04-30",
       "deliveryDate": null,
