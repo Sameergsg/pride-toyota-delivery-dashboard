@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T11:49:48.924Z",
+  "generatedAt": "2026-08-20T12:22:55.759Z",
   "rows": [
     {
       "srNo": "1",
@@ -21164,11 +21164,11 @@
       "variant": "E MT",
       "colour": "CAFE WHITE",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "SUNIL",
+      "customerName": "POONAM KUMARI",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
