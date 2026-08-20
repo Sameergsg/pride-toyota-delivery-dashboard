@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T13:24:49.813Z",
+  "generatedAt": "2026-08-20T14:06:23.815Z",
   "rows": [
     {
       "srNo": "1",
@@ -20537,14 +20537,14 @@
       "tlName": "LILADHAR",
       "soName": "LILADHAR",
       "customerName": "SANJAY KUMAR",
-      "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
+      "ctdmsStatus": "INVOICE",
+      "customerStatus": "DELIVERED",
       "estDeliveryDate": "2026-08-21",
-      "ctdmsInvoice": null,
-      "dnDate": null,
+      "ctdmsInvoice": "INV261000419",
+      "dnDate": "2026-08-20",
       "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
-      "reference": null,
+      "stockStatus": "SOLD",
+      "reference": "LILADHAR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1169000",
       "rtoName": null,
