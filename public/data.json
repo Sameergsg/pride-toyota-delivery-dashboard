@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T10:54:04.517Z",
+  "generatedAt": "2026-08-20T11:16:21.462Z",
   "rows": [
     {
       "srNo": "1",
@@ -22064,11 +22064,11 @@
       "variant": "LEGENDER 4X2 AT",
       "colour": "WHITEPEARL & A.BLACK",
       "intColour": "Black & Maroon",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "CEO SIR",
+      "soName": "CEO SIR",
+      "customerName": "SIKAR INFRA & RESEARCH CENTRE PRIVATE LIMITED",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "HOLD",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
