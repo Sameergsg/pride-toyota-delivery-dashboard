@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T12:22:07.887Z",
+  "generatedAt": "2026-08-21T13:23:51.183Z",
   "rows": [
     {
       "srNo": "1",
@@ -20447,7 +20447,7 @@
       "tlName": "SAHIL",
       "soName": "SAHIL",
       "customerName": "SEEMA RANI",
-      "ctdmsStatus": "UPDATING",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000375",
