@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T07:15:14.748Z",
+  "generatedAt": "2026-08-21T08:02:40.076Z",
   "rows": [
     {
       "srNo": "1",
@@ -22514,11 +22514,11 @@
       "variant": "S",
       "colour": "MIDNIGHT BLACK",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "NITISH",
+      "customerName": "PAWAN KUMAR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
@@ -22849,7 +22849,7 @@
       "customerName": "RAHUL SHIRSH VORA",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-08-23",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
