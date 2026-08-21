@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T13:23:51.183Z",
+  "generatedAt": "2026-08-21T14:04:30.863Z",
   "rows": [
     {
       "srNo": "1",
@@ -10337,13 +10337,13 @@
       "tlName": "AJIT",
       "soName": "NITISH",
       "customerName": "RAJU MEHRA",
-      "ctdmsStatus": "BND",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-21",
+      "ctdmsStatus": "UPDATING",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000119",
       "dnDate": "2026-02-28",
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "deliveryDate": "2026-08-21",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1924000",
