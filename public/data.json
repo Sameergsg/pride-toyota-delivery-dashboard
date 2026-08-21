@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T05:00:48.568Z",
+  "generatedAt": "2026-08-21T05:54:34.969Z",
   "rows": [
     {
       "srNo": "1",
@@ -17004,10 +17004,10 @@
       "dnDate": "2026-04-30",
       "deliveryDate": "2026-08-20",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "KUNAL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1977000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
@@ -17034,10 +17034,10 @@
       "dnDate": "2026-04-30",
       "deliveryDate": "2026-08-20",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "KUNAL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1972000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
@@ -21717,7 +21717,7 @@
       "reference": "LILADHAR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1169000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
