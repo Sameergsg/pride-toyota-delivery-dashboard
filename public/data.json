@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T05:49:42.892Z",
+  "generatedAt": "2026-08-22T06:19:43.127Z",
   "rows": [
     {
       "srNo": "1",
@@ -20607,7 +20607,7 @@
       "reference": "NITISH",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1572000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
@@ -22407,7 +22407,7 @@
       "reference": "AJIT",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "743000",
-      "rtoName": null,
+      "rtoName": "CHARKHI DADRI",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
