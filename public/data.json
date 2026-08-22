@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-22T04:56:25.162Z",
+  "generatedAt": "2026-08-22T05:18:54.228Z",
   "rows": [
     {
       "srNo": "1",
@@ -20604,7 +20604,7 @@
       "dnDate": null,
       "deliveryDate": "2026-08-21",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "NITISH",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1572000",
       "rtoName": null,
@@ -22404,7 +22404,7 @@
       "dnDate": null,
       "deliveryDate": "2026-08-21",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "AJIT",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "743000",
       "rtoName": null,
@@ -22885,7 +22885,7 @@
       "deliveryDate": null,
       "stockStatus": "PHYSICAL",
       "reference": null,
-      "tfsPaymentDate": null,
+      "tfsPaymentDate": "1899-12-30",
       "exShowroom": "865000",
       "rtoName": null,
       "remarks": null,
