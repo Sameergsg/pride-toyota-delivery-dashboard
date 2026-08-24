@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T03:29:10.439Z",
+  "generatedAt": "2026-08-24T04:13:49.920Z",
   "rows": [
     {
       "srNo": "1",
@@ -22004,12 +22004,12 @@
       "variant": "G",
       "colour": "MIDNIGHT BLACK",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "SAURAV",
+      "customerName": "AMIT SINGH",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-08-25",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -22518,18 +22518,18 @@
       "soName": "NITISH",
       "customerName": "PAWAN KUMAR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-27",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "deliveryDate": "2026-08-24",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1371000",
       "rtoName": null,
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "752",
