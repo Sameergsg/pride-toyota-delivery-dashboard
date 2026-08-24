@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T10:08:14.262Z",
+  "generatedAt": "2026-08-24T10:59:36.429Z",
   "rows": [
     {
       "srNo": "1",
@@ -10337,7 +10337,7 @@
       "tlName": "AJIT",
       "soName": "NITISH",
       "customerName": "RAJU MEHRA",
-      "ctdmsStatus": "UPDATING",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000119",
@@ -14717,7 +14717,7 @@
       "tlName": "LILADHAR",
       "soName": "SAURAV",
       "customerName": "MAMTA RANI",
-      "ctdmsStatus": "UPDATING",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000366",
@@ -19037,7 +19037,7 @@
       "tlName": "SAHIL",
       "soName": "SAHIL",
       "customerName": "RAM CHAND KHOSLA",
-      "ctdmsStatus": "UPDATING",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
       "ctdmsInvoice": "INV261000357",
@@ -21019,7 +21019,7 @@
       "customerName": "RAHUL SHIRSH VORA",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-24",
+      "estDeliveryDate": "2026-08-25",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
