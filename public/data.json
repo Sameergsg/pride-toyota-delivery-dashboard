@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T08:09:37.797Z",
+  "generatedAt": "2026-08-24T09:10:17.844Z",
   "rows": [
     {
       "srNo": "1",
@@ -22008,7 +22008,7 @@
       "soName": "SAURAV",
       "customerName": "AMIT SINGH",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
+      "customerStatus": null,
       "estDeliveryDate": "2026-08-25",
       "ctdmsInvoice": null,
       "dnDate": null,
