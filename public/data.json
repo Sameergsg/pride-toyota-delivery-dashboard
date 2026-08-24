@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T10:59:36.429Z",
+  "generatedAt": "2026-08-24T11:28:11.832Z",
   "rows": [
     {
       "srNo": "1",
@@ -17059,7 +17059,7 @@
       "customerName": "MANAS TRADERS",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-24",
+      "estDeliveryDate": "2026-08-25",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -21856,7 +21856,7 @@
       "intColour": "2 TONE BLACK & BEIGE",
       "tlName": "CEO SIR",
       "soName": "CEO SIR",
-      "customerName": "RAVI GOYAL (SARABJEET)",
+      "customerName": "RAVI GOYAL (SARBJEET)",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": "2026-08-24",
@@ -21946,7 +21946,7 @@
       "intColour": "2 TONE ASH BROWN",
       "tlName": "CEO SIR",
       "soName": "CEO SIR",
-      "customerName": "SADAQAT ALI KHAN",
+      "customerName": "SADAQAT ALI KHAN (SARBJEET)",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": "2026-08-24",
