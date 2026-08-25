@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T10:58:57.389Z",
+  "generatedAt": "2026-08-25T11:24:58.303Z",
   "rows": [
     {
       "srNo": "1",
@@ -10331,7 +10331,7 @@
       "model": "HYRYDER",
       "suffix": "D22U5",
       "fuel": "HYBRID",
-      "variant": "G",
+      "variant": "HYBRID",
       "colour": "CAFE WHITE",
       "intColour": "INTERIOR COLOR FOR D22",
       "tlName": "AJIT",
