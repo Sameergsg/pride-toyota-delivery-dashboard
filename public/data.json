@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T10:28:20.739Z",
+  "generatedAt": "2026-08-25T10:58:57.389Z",
   "rows": [
     {
       "srNo": "1",
@@ -22667,19 +22667,19 @@
       "tlName": "SAHIL",
       "soName": "SAHIL",
       "customerName": "RAHUL SHIRSH VORA",
-      "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-25",
-      "ctdmsInvoice": null,
-      "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
-      "reference": null,
+      "ctdmsStatus": "INVOICE",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
+      "ctdmsInvoice": "INV261000426",
+      "dnDate": "2026-08-25",
+      "deliveryDate": "2026-08-25",
+      "stockStatus": "SOLD",
+      "reference": "SAHIL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "3761000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "757",
