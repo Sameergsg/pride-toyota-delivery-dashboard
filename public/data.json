@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T05:54:24.361Z",
+  "generatedAt": "2026-08-25T06:25:22.709Z",
   "rows": [
     {
       "srNo": "1",
@@ -10344,10 +10344,10 @@
       "dnDate": "2026-02-28",
       "deliveryDate": "2026-08-24",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "NITISH",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1924000",
-      "rtoName": null,
+      "rtoName": "BHIWANI",
       "remarks": null,
       "stockLocation": null
     },
@@ -21384,10 +21384,10 @@
       "dnDate": "2026-08-24",
       "deliveryDate": "2026-08-24",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "CEO SIR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "673000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
@@ -22554,10 +22554,10 @@
       "dnDate": "2026-08-24",
       "deliveryDate": "2026-08-24",
       "stockStatus": "SOLD",
-      "reference": null,
+      "reference": "CEO SIR",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "2097000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
       "stockLocation": "BHIWANI"
     },
