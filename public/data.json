@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T11:51:04.833Z",
+  "generatedAt": "2026-08-25T12:23:38.771Z",
   "rows": [
     {
       "srNo": "1",
@@ -18014,11 +18014,11 @@
       "variant": "G MT",
       "colour": "GAMING GREY",
       "intColour": "2 TONE BLACK & BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "RIYA",
+      "customerName": "AMIT S/O RAJKUMAR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
