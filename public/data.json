@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T07:17:34.447Z",
+  "generatedAt": "2026-08-25T08:05:05.908Z",
   "rows": [
     {
       "srNo": "1",
@@ -17150,7 +17150,7 @@
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
-      "ctdmsInvoice": null,
+      "ctdmsInvoice": "INV261000425",
       "dnDate": null,
       "deliveryDate": null,
       "stockStatus": "PHYSICAL",
