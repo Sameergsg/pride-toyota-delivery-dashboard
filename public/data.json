@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-26T05:56:26.223Z",
+  "generatedAt": "2026-08-26T06:32:32.765Z",
   "rows": [
     {
       "srNo": "1",
@@ -22514,12 +22514,12 @@
       "variant": "E MT",
       "colour": "GAMING GREY",
       "intColour": "2 TONE BLACK & BEIGE",
-      "tlName": "AJIT",
-      "soName": "NITISH",
-      "customerName": "UMESH",
+      "tlName": null,
+      "soName": null,
+      "customerName": null,
       "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-08-30",
+      "customerStatus": "FREE",
+      "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
