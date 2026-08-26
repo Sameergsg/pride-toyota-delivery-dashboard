@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-26T10:03:56.498Z",
+  "generatedAt": "2026-08-26T10:58:01.050Z",
   "rows": [
     {
       "srNo": "1",
@@ -17989,7 +17989,7 @@
       "customerName": "RAHUL BHARTI",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-08-31",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -22514,11 +22514,11 @@
       "variant": "E MT",
       "colour": "GAMING GREY",
       "intColour": "2 TONE BLACK & BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "CEO SIR",
+      "soName": "CEO SIR",
+      "customerName": "JATINDER KUMAR (SARBJEET)",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "HOLD",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
