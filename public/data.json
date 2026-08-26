@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-26T11:25:01.296Z",
+  "generatedAt": "2026-08-26T11:53:03.545Z",
   "rows": [
     {
       "srNo": "1",
@@ -17954,12 +17954,12 @@
       "variant": "S MT",
       "colour": "CAFE WHITE",
       "intColour": "INTERIOR COLOR FOR D22",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "NITISH",
+      "customerName": "J.K LAKSHIMI CEMENT LIMITED",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-08-31",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
