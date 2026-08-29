@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-29T11:13:24.885Z",
+  "generatedAt": "2026-08-29T15:41:11.205Z",
   "rows": [
     {
       "srNo": "1",
@@ -22037,11 +22037,11 @@
       "tlName": "LILADHAR",
       "soName": "ROHIT KUMAR",
       "customerName": "RANJEET SINGH KANSAY",
-      "ctdmsStatus": "FRESH",
+      "ctdmsStatus": "BND",
       "customerStatus": "ALLOCATE",
       "estDeliveryDate": "2026-08-30",
-      "ctdmsInvoice": null,
-      "dnDate": null,
+      "ctdmsInvoice": "INV261000437",
+      "dnDate": "2026-08-29",
       "deliveryDate": null,
       "stockStatus": "PHYSICAL",
       "reference": null,
