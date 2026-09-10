@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T09:20:28.711Z",
+  "generatedAt": "2026-09-10T13:43:00.981Z",
   "rows": [
     {
       "srNo": "1",
@@ -18239,7 +18239,7 @@
       "exShowroom": "2134000",
       "rtoName": "OTHER AREA",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "609",
@@ -19709,7 +19709,7 @@
       "exShowroom": "1999000",
       "rtoName": "OTHER AREA",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "658",
@@ -22829,7 +22829,7 @@
       "exShowroom": "3184000",
       "rtoName": "OTHER AREA",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "762",
@@ -23009,7 +23009,7 @@
       "exShowroom": "4292000",
       "rtoName": "BHIWANI",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "768",
@@ -23129,7 +23129,7 @@
       "exShowroom": "845000",
       "rtoName": "CHARKHI DADRI",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "772",
@@ -23297,19 +23297,19 @@
       "tlName": "SAHIL",
       "soName": "SAHIL",
       "customerName": "DG METAL",
-      "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-09-10",
-      "ctdmsInvoice": null,
-      "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
-      "reference": null,
+      "ctdmsStatus": "INVOICE",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
+      "ctdmsInvoice": "INV261000453",
+      "dnDate": "2026-09-10",
+      "deliveryDate": "2026-09-10",
+      "stockStatus": "SOLD",
+      "reference": "SAHIL",
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "3761000",
-      "rtoName": null,
+      "rtoName": "OTHER AREA",
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "778",
