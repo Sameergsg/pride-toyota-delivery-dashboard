@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-15T10:37:12.328Z",
+  "generatedAt": "2026-09-15T15:19:54.535Z",
   "rows": [
     {
       "srNo": "1",
@@ -22429,7 +22429,7 @@
       "customerName": "NAVDEEP",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "2026-09-17",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -22784,12 +22784,12 @@
       "variant": "S",
       "colour": "CAFE WHITE",
       "intColour": "BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "SAHIL",
+      "soName": "KARAN",
+      "customerName": "ANKIT",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
-      "estDeliveryDate": null,
+      "customerStatus": "ALLOCATE",
+      "estDeliveryDate": "2026-09-24",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
