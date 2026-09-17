@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T08:05:33.209Z",
+  "generatedAt": "2026-09-17T13:38:38.626Z",
   "rows": [
     {
       "srNo": "1",
@@ -23298,18 +23298,18 @@
       "soName": "SAHIL",
       "customerName": "IKWINDER KAUR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-09-17",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
-      "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "deliveryDate": "2026-09-17",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "925000",
       "rtoName": null,
       "remarks": null,
-      "stockLocation": "BHIWANI"
+      "stockLocation": null
     },
     {
       "srNo": "778",
@@ -23749,7 +23749,7 @@
       "customerName": "VIKAS KUMAR MITTAL  (Kirti ji / Micki ji freind)",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-09-17",
+      "estDeliveryDate": "2026-09-18",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
