@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T11:15:15.318Z",
+  "generatedAt": "2026-09-19T14:33:31.981Z",
   "rows": [
     {
       "srNo": "1",
@@ -23384,11 +23384,11 @@
       "variant": "V AT",
       "colour": "CAFE WHITE",
       "intColour": "2 TONE BLACK & BEIGE",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "AJIT",
+      "soName": "NITISH",
+      "customerName": "AJIT VERMA",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
