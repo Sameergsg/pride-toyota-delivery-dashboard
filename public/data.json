@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T10:27:22.817Z",
+  "generatedAt": "2026-10-07T17:29:31.665Z",
   "rows": [
     {
       "srNo": null,
@@ -24859,7 +24859,7 @@
       "customerName": "VIKASH KUMAR SHARMA",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "1899-12-30",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
@@ -24879,7 +24879,7 @@
       "engNo": "1GD A986953",
       "mfYear": "2026",
       "model": "FORTUNER",
-      "suffix": "FRNBK",
+      "suffix": "FRNBK-PW",
       "fuel": "DIESEL",
       "variant": "4X2 AT",
       "colour": "PLATINUM WHITE PEARL",
@@ -24889,14 +24889,14 @@
       "customerName": "MALKEET",
       "ctdmsStatus": "FRESH",
       "customerStatus": "ALLOCATE",
-      "estDeliveryDate": null,
+      "estDeliveryDate": "1899-12-30",
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
       "stockStatus": "PHYSICAL",
       "reference": null,
       "tfsPaymentDate": null,
-      "exShowroom": "3761000",
+      "exShowroom": "3781000",
       "rtoName": null,
       "remarks": null,
       "stockLocation": "BHIWANI"
