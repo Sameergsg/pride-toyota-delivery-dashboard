@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T08:07:01.187Z",
+  "generatedAt": "2026-10-09T15:23:44.557Z",
   "rows": [
     {
       "srNo": null,
@@ -24494,11 +24494,11 @@
       "variant": "LEADER 4X2 AT",
       "colour": "SUPERWHITE & A.BLACK",
       "intColour": "BLACK MAROON",
-      "tlName": "CEO SIR",
-      "soName": "CEO SIR",
-      "customerName": "R K MISHRA",
+      "tlName": "SAHIL",
+      "soName": "SAHIL",
+      "customerName": "SUKHWINDER KAUR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "HOLD",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
