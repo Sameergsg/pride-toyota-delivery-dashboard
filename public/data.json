@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T12:46:18.108Z",
+  "generatedAt": "2026-10-10T17:31:09.433Z",
   "rows": [
     {
       "srNo": null,
@@ -18455,7 +18455,7 @@
       "srNo": null,
       "invoiceDate": null,
       "aging": "136",
-      "chassis": "MBJABBAAX01566655",
+      "chassis": "MBJABBAA701558464",
       "engNo": "M20A NG04383",
       "mfYear": "2026",
       "model": "HYCROSS",
@@ -18475,7 +18475,7 @@
       "deliveryDate": null,
       "stockStatus": "SOLD",
       "reference": "SAHIL",
-      "tfsPaymentDate": "2026-06-17",
+      "tfsPaymentDate": "2026-04-23",
       "exShowroom": "2892000",
       "rtoName": "OTHER AREA",
       "remarks": null,
