@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T12:33:06.440Z",
+  "generatedAt": "2026-10-17T16:00:53.098Z",
   "rows": [
     {
       "srNo": null,
@@ -23867,11 +23867,11 @@
       "tlName": "BIJENDER",
       "soName": "BIJENDER",
       "customerName": "RAMO DEVI",
-      "ctdmsStatus": "FRESH",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
-      "ctdmsInvoice": null,
-      "dnDate": null,
+      "ctdmsInvoice": "INV261000512",
+      "dnDate": "2026-10-17",
       "deliveryDate": null,
       "stockStatus": "SOLD",
       "reference": null,
