@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T01:16:34.675Z",
+  "generatedAt": "2026-10-18T06:08:47.568Z",
   "rows": [
     {
       "srNo": null,
@@ -25784,11 +25784,11 @@
       "variant": "GX+ 8S",
       "colour": "SUPER WHITE",
       "intColour": "BLACK",
-      "tlName": null,
-      "soName": null,
-      "customerName": null,
+      "tlName": "LILADHAR",
+      "soName": "LILADHAR",
+      "customerName": "LD",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "FREE",
+      "customerStatus": "ALLOCATE",
       "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
