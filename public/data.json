@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-23T12:56:34.920Z",
+  "generatedAt": "2026-10-23T17:36:16.722Z",
   "rows": [
     {
       "srNo": null,
@@ -24857,11 +24857,11 @@
       "tlName": "SAHIL",
       "soName": "SAHIL",
       "customerName": "SUKHDEEP SINGH",
-      "ctdmsStatus": "FRESH",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
-      "ctdmsInvoice": null,
-      "dnDate": null,
+      "ctdmsInvoice": "INV261000529",
+      "dnDate": "2026-10-23",
       "deliveryDate": null,
       "stockStatus": "SOLD",
       "reference": null,
