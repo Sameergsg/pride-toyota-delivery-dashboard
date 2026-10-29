@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T13:25:35.474Z",
+  "generatedAt": "2026-10-29T19:03:57.002Z",
   "rows": [
     {
       "srNo": null,
@@ -25278,12 +25278,12 @@
       "soName": "NEHA",
       "customerName": "RAMESH KUMAR",
       "ctdmsStatus": "FRESH",
-      "customerStatus": "ALLOCATE",
-      "estDeliveryDate": "2026-10-29",
+      "customerStatus": "DELIVERED",
+      "estDeliveryDate": null,
       "ctdmsInvoice": null,
       "dnDate": null,
       "deliveryDate": null,
-      "stockStatus": "PHYSICAL",
+      "stockStatus": "SOLD",
       "reference": null,
       "tfsPaymentDate": "1899-12-30",
       "exShowroom": "1169000",
