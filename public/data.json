@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-09T10:32:27.481Z",
+  "generatedAt": "2026-11-09T21:11:01.339Z",
   "rows": [
     {
       "srNo": null,
@@ -26237,11 +26237,11 @@
       "tlName": "SAHIL",
       "soName": "KARAN",
       "customerName": "SAMSHER",
-      "ctdmsStatus": "FRESH",
+      "ctdmsStatus": "INVOICE",
       "customerStatus": "DELIVERED",
       "estDeliveryDate": null,
-      "ctdmsInvoice": null,
-      "dnDate": null,
+      "ctdmsInvoice": "INV261000574",
+      "dnDate": "2026-11-09",
       "deliveryDate": null,
       "stockStatus": "SOLD",
       "reference": "KARAN",
